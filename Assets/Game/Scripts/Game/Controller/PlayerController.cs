@@ -1,0 +1,92 @@
+
+using Game.Controller;
+using Spine.Unity;
+using UnityEngine;
+
+namespace Game.Controller
+{
+    class PlayerController : Character
+    {
+        public SkeletonAnimation skeletonAnim;
+        private CharacterController _controller;
+
+        public float gravity = 98f;
+
+        public float speed;
+
+        private float _gravitySpeed;
+
+        void Awake()
+        {
+            _controller = GetComponent<CharacterController>();
+        }
+
+        void OnEnable()
+        {
+            _controller.enabled = true;
+        }
+
+        void OnDisable()
+        {
+            _controller.enabled = false;
+        }
+
+        protected override void UpdateMovement()
+        {
+            if (!_controller.isGrounded)
+            {
+                _gravitySpeed += gravity * Time.deltaTime;
+                _controller.Move(Vector3.down * _gravitySpeed * Time.deltaTime);
+            }
+            else
+                _gravitySpeed = 0;
+
+            var cameraRot = Camera.main.transform.rotation;
+            var cameraTotY = cameraRot.eulerAngles.y;
+
+            var rotateMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(cameraTotY, Vector3.up));
+
+            if (Input.GetKey(KeyCode.A))
+            {
+                if (skeletonAnim.transform.localScale.x > 0)
+                    skeletonAnim.transform.localScale = new Vector3(
+                        skeletonAnim.transform.localScale.x * -1,
+                        skeletonAnim.transform.localScale.y,
+                        skeletonAnim.transform.localScale.z);
+
+                _controller.Move((Vector3) (rotateMatrix * Vector3.left) * Time.deltaTime * speed);
+                skeletonAnim.AnimationName = "Move";
+            }
+
+            if (Input.GetKey(KeyCode.D))
+            {
+                if (skeletonAnim.transform.localScale.x < 0)
+                    skeletonAnim.transform.localScale = new Vector3(
+                        skeletonAnim.transform.localScale.x * -1,
+                        skeletonAnim.transform.localScale.y,
+                        skeletonAnim.transform.localScale.z);
+
+                _controller.Move((Vector3) (rotateMatrix * Vector3.right) * Time.deltaTime * speed);
+                skeletonAnim.AnimationName = "Move";
+            }
+
+            if (Input.GetKey(KeyCode.W))
+            {
+                _controller.Move((Vector3) (rotateMatrix * Vector3.forward) * Time.deltaTime * speed);
+                skeletonAnim.AnimationName = "Move";
+            }
+
+            if (Input.GetKey(KeyCode.S))
+            {
+                _controller.Move((Vector3) (rotateMatrix * Vector3.back) * Time.deltaTime * speed);
+                skeletonAnim.AnimationName = "Move";
+            }
+
+            if (!Input.GetKey(KeyCode.A) &&
+                !Input.GetKey(KeyCode.D) &&
+                !Input.GetKey(KeyCode.W) &&
+                !Input.GetKey(KeyCode.S))
+                skeletonAnim.AnimationName = "Relax";
+        }
+    }
+}
