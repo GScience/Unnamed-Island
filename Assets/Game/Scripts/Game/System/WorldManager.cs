@@ -73,7 +73,7 @@ namespace Island.Game.System
             if (worldInfo == null)
             {
                 if (!IsWorldExists("_DEBUG-WORLD_"))
-                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(20, 20), () => LoadWorld("_DEBUG-WORLD_"));
+                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(100, 100), () => LoadWorld("_DEBUG-WORLD_"));
                 else
                     LoadWorld("_DEBUG-WORLD_");
                 enabled = false;
