@@ -297,6 +297,8 @@ namespace Island.Game.Render
                 yield return 1;
             }
 
+            _mesh.Clear(false);
+
             _mesh.SetVertices(_vertices);
             _mesh.SetNormals(_normals);
             _mesh.SetUVs(0, _uvs);
