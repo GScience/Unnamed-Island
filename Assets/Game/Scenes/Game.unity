@@ -5927,7 +5927,7 @@ MonoBehaviour:
   chunkPool: 100
   worldAnchor: {fileID: 1383004603}
   sight: 4
-  chunkParent: {fileID: 0}
+  chunkParent: {fileID: 18489477}
   physicalReadyChunkCount: 0
   worldLoader: {fileID: 664156985}
 --- !u!114 &1038840896
@@ -6683,7 +6683,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -6705,15 +6705,14 @@ MonoBehaviour:
 
     Update per second = 3
 
-    Memory = 457MB/898MB
+    Memory = 555MB/1659MB
 
     Free
-    Memory = 441MB
+    Memory = 1104MB
 
-    Probably performance problem found = 1
+    Probably performance problem found = 0
 
-    May has performance
-    problem!'
+'
 --- !u!222 &1630246229
 CanvasRenderer:
   m_ObjectHideFlags: 0

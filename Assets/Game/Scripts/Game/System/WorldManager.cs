@@ -73,7 +73,7 @@ namespace Island.Game.System
             if (worldInfo == null)
             {
                 if (!IsWorldExists("_DEBUG-WORLD_"))
-                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(100, 100), () => LoadWorld("_DEBUG-WORLD_"));
+                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(20, 20), () => LoadWorld("_DEBUG-WORLD_"));
                 else
                     LoadWorld("_DEBUG-WORLD_");
                 enabled = false;
@@ -253,7 +253,7 @@ namespace Island.Game.System
                 onFinish();
             };
 
-            worldGenerator.Generate(worldName, worldSize, new Vector3(1, 0.25f, 1), new Vector3Int(16, 128, 16));
+            worldGenerator.Generate(worldName, worldSize, new Vector3(2, 0.25f, 2), new Vector3Int(16, 128, 16));
         }
 
         /// <summary>

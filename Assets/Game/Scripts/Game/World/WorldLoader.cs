@@ -16,6 +16,7 @@ namespace Island.Game.World
         public void LoadWorld(string worldPath)
         {
             _dir = Application.persistentDataPath + "/world/" + worldPath + "/";
+            LoadWorldInfo();
         }
 
         public void LoadChunk(ChunkPos chunkPos, ref Block[,,] blocks)

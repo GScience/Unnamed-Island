@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,8 +18,15 @@ namespace Island.Game.World
     /// </summary>
     public abstract class WorldGenerator : MonoBehaviour
     {
-        public const int GeneratorVersion = 1;
+        private enum GeneratingStage : int
+        {
+            LoadingWorldInfo = 0,
+            LoadingChunk = 1,
+            LoadingEnvElement = 2
+        }
 
+        public const int GeneratorVersion = 1;
+        
         protected abstract void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks);
         protected abstract void Init();
 
@@ -32,21 +40,26 @@ namespace Island.Game.World
         public UnityAction<string> onStageChange;
         public UnityAction onLoaded;
 
-        protected DataManager dataManager;
+        private int _loadedChunk;
+        private int _totalChunk;
+        private bool _isLoading;
+        private GeneratingStage _stage;
+
+        private CancellationTokenSource _cts;
 
         private void Awake()
         {
-            dataManager = GameManager.DataManager;
-            if (dataManager == null)
-            {
-                var dataManagerObj = new GameObject();
-                dataManager = dataManagerObj.AddComponent<DataManager>();
-            }
-
             Init();
         }
         public void Generate(string worldName, ChunkPos worldSize, Vector3 blockSize, Vector3Int chunkSize)
         {
+            if (_isLoading)
+                Debug.LogError("Can't generate two world at the same time");
+
+            _isLoading = true;
+            _loadedChunk = 0;
+            _totalChunk = worldSize.x * worldSize.z;
+
             this.worldName = worldName;
             this.chunkSize = chunkSize;
             this.worldSize = worldSize;
@@ -61,49 +74,72 @@ namespace Island.Game.World
 
             Directory.CreateDirectory(outDir);
 
+            _stage = 0;
+
             // 创建世界基本信息
             onStageChange?.Invoke("正在理解世界");
             GenerateWorldInfo();
 
             // 创建Chunk数据
             onStageChange?.Invoke("火山正在喷发");
-            StartCoroutine(GenerateChunks(() => onLoaded?.Invoke()));
+            GenerateChunksAsync();
         }
 
-        IEnumerator GenerateChunks(Action onFinish = null)
+        void GenerateChunksAsync()
         {
-            var blocks = new Block[chunkSize.x, chunkSize.y, chunkSize.z];
+            _cts = new CancellationTokenSource();
 
-            var loadedChunk = 0;
-            var totalChunk = worldSize.x * worldSize.z;
-
-            var lastStartTime = DateTime.Now;
-
-            for (var x = 0; x < worldSize.x; ++x)
+            var chunkLoadingTask = new Task(() =>
             {
-                for (var z = 0; z < worldSize.z; ++z)
+                var blocks = new Block[chunkSize.x, chunkSize.y, chunkSize.z];
+
+                for (var x = 0; x < worldSize.x; ++x)
                 {
-                    var chunkPos = new ChunkPos(x, z);
-                    GenChunk(chunkPos, ref blocks);
-                    SaveChunk(chunkPos, blocks);
-
-                    ++loadedChunk;
-
-                    onStageChange?.Invoke($"火山正在喷发 {loadedChunk}/{totalChunk}");
-
-                    var currentTime = DateTime.Now;
-
-                    if ((currentTime - lastStartTime).TotalMilliseconds > 100)
+                    for (var z = 0; z < worldSize.z; ++z)
                     {
-                        yield return 1;
-                        lastStartTime = DateTime.Now;
+                        var chunkPos = new ChunkPos(x, z);
+                        GenChunk(chunkPos, ref blocks);
+                        SaveChunk(chunkPos, blocks);
+
+                        ++_loadedChunk;
                     }
                 }
-            }
 
-            onFinish?.Invoke();
+                ++_stage;
+            }, _cts.Token);
+
+            chunkLoadingTask.Start();
         }
 
+        private void GenerateEnvElement()
+        {
+            ++_stage;
+        }
+
+        private void OnDisable()
+        {
+            _cts.Cancel();
+        }
+
+        private void Update()
+        {
+            if (!_isLoading)
+                return;
+
+            switch (_stage)
+            {
+                case GeneratingStage.LoadingChunk:
+                    onStageChange?.Invoke($"火山正在喷发 {_loadedChunk}/{_totalChunk}");
+                    break;
+                case GeneratingStage.LoadingEnvElement:
+                    GenerateEnvElement();
+                    break;
+                default:
+                    onLoaded?.Invoke();
+                    _isLoading = false;
+                    break;
+            }
+        }
         private void SaveChunk(ChunkPos chunkPos, Block[,,] blocks)
         {
             var chunkStream = File.Create(outDir + "c." + chunkPos.x + "." + chunkPos.z + ".dat");
@@ -160,6 +196,7 @@ namespace Island.Game.World
                     worldInfoWriter.Write(chunkSize.z);
                 }
             }
+            ++_stage;
         }
     }
 }
