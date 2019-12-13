@@ -298,11 +298,8 @@ namespace Island.Game.Render
             }
 
             _mesh.SetVertices(_vertices);
-            yield return 1;
             _mesh.SetNormals(_normals);
-            yield return 1;
             _mesh.SetUVs(0, _uvs);
-            yield return 1;
             _mesh.SetTriangles(_triangles, 0);
             yield return 1;
             /*_mesh.vertices = _vertices.ToArray();

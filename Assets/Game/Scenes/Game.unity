@@ -6541,7 +6541,7 @@ CharacterController:
   m_Height: 2
   m_Radius: 0.4
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.5
   m_SkinWidth: 0.2
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1.2, z: 0}
@@ -6683,7 +6683,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -6701,18 +6701,19 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'FPS = 4
+  m_Text: 'FPS = 3
 
-    Update per second = 4
+    Update per second = 3
 
-    Memory = 569MB/943MB
+    Memory = 457MB/898MB
 
     Free
-    Memory = 373MB
+    Memory = 441MB
 
-    Probably performance problem found = 0
+    Probably performance problem found = 1
 
-'
+    May has performance
+    problem!'
 --- !u!222 &1630246229
 CanvasRenderer:
   m_ObjectHideFlags: 0
