@@ -48,6 +48,9 @@ namespace Island.Game.World
                 for (var y = 0; y < chunkSize.y; ++y)
                     for (var z = 0; z < chunkSize.z; ++z)
                         blocks[x, y, z].ReadFrom(reader, blockIndex);
+
+            reader.Close();
+            chunkStream.Close();
         }
 
         private void LoadWorldInfo()

@@ -134,6 +134,7 @@ namespace Island.Game.World
                     for (var z = 0; z < chunkSize.z; ++z)
                         blocks[x, y, z].WriteTo(writer, blockIndex);
 
+            writer.Close();
             chunkStream.Close();
         }
 
