@@ -74,7 +74,7 @@ namespace Island.Game.Controller
                 skeletonAnim.AnimationName = "Move";
             }
 
-            if (!Input.GetKey(KeyCode.W))
+            if (Input.GetKey(KeyCode.W))
             {
                 _controller.Move((Vector3) (rotateMatrix * Vector3.forward) * Time.deltaTime * speed);
                 skeletonAnim.AnimationName = "Move";
@@ -88,7 +88,7 @@ namespace Island.Game.Controller
 
             if (!Input.GetKey(KeyCode.A) &&
                 !Input.GetKey(KeyCode.D) &&
-                Input.GetKey(KeyCode.W) &&
+                !Input.GetKey(KeyCode.W) &&
                 !Input.GetKey(KeyCode.S))
                 skeletonAnim.AnimationName = "Relax";
         }

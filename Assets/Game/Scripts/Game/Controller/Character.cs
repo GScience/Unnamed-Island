@@ -14,8 +14,10 @@ namespace Island.Game.Controller
     public abstract class Character : MonoBehaviour
     {
         public ChunkPos ChunkPos => new ChunkPos(
-            Mathf.FloorToInt(transform.position.x / 16), 
-            Mathf.FloorToInt(transform.position.z / 16));
+            Mathf.FloorToInt(transform.position.x / 
+                (GameManager.WorldManager.chunkSize.x * GameManager.WorldManager.blockSize.x)), 
+            Mathf.FloorToInt(transform.position.z / 
+                (GameManager.WorldManager.chunkSize.z * GameManager.WorldManager.blockSize.z)));
 
         public ChunkContainer GetChunk(ChunkPos chunkPos)
         {
@@ -37,7 +39,7 @@ namespace Island.Game.Controller
         protected abstract void UpdateMovement();
 
 #if UNITY_EDITOR
-        [CustomEditor(typeof(Character))]
+        [CustomEditor(typeof(Character),editorForChildClasses:true)]
         class CharactorEditor : Editor
         {
             public override void OnInspectorGUI()
