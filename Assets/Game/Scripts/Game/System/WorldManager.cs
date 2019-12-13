@@ -70,7 +70,6 @@ namespace Island.Game.System
         {
             worldInfo = FindObjectOfType<WorldInfo>();
 
-#if UNITY_EDITOR
             if (worldInfo == null)
             {
                 if (!IsWorldExists("_DEBUG-WORLD_"))
@@ -80,7 +79,7 @@ namespace Island.Game.System
                 enabled = false;
                 return;
             }
-#endif
+
             worldLoader.LoadWorld(worldInfo.worldPath);
             EnlargePool(chunkPool);
         }
