@@ -5,19 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Game.Data.Block;
-using Game.System;
-using Game.World;
+using Island.Game.Data.Blocks;
+using Island.Game.System;
+using Island.Game.World;
 using UnityEngine;
 
-namespace Game.Render
+namespace Island.Game.Render
 {
+    /// <summary>
+    /// 区块网格生成器
+    /// </summary>
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(ChunkContainer))]
     public class ChunkMeshGenerator : MonoBehaviour
     {
         public bool physicsReady;
 
-        private static bool _isGeneratingMesh;
+        private static int _generatingMeshTaskCount;
 
         private readonly List<Vector3> _vertices = new List<Vector3>();
         private readonly List<Vector3> _normals = new List<Vector3>();
@@ -30,6 +33,7 @@ namespace Game.Render
         private MeshCollider _meshCollider;
 
         private Mesh _mesh;
+        private bool _isGeneratingMesh;
 
         void Awake()
         {
@@ -58,7 +62,8 @@ namespace Game.Render
         public void Unload()
         {
             StopAllCoroutines();
-            _isGeneratingMesh = false;
+            if (_isGeneratingMesh)
+                --_generatingMeshTaskCount;
             physicsReady = false;
             _mesh.Clear();
             if (_meshCollider == null)
@@ -80,6 +85,7 @@ namespace Game.Render
         IEnumerator MeshRefreshCoroutine()
         {
             _isGeneratingMesh = true;
+            ++_generatingMeshTaskCount;
             _meshRenderer.enabled = false;
             physicsReady = false;
 
@@ -317,13 +323,16 @@ namespace Game.Render
                 _meshCollider.sharedMesh = _mesh;
 
             _meshRenderer.enabled = true;
+            --_generatingMeshTaskCount;
             _isGeneratingMesh = false;
             physicsReady = true;
         }
 
         public bool TryRefresh()
         {
-            if (!_isGeneratingMesh)
+            // 没有mesh生成任务或者游戏初始化时可以进行区块刷新
+            if (_generatingMeshTaskCount < 1 || 
+                (GameManager.IsInitializing && _generatingMeshTaskCount < 5))
             {
                 StartCoroutine(MeshRefreshCoroutine());
                 return true;

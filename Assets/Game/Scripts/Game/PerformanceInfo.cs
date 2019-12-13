@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Island.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +8,11 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
 
-namespace Game
+namespace Island
 {
+    /// <summary>
+    /// 显示性能信息
+    /// </summary>
     [RequireComponent(typeof(Text))]
     [ExecuteAlways]
     class PerformanceInfo : MonoBehaviour
@@ -33,6 +37,10 @@ namespace Game
             _text.color = Color.white;
         }
 
+        private void Start()
+        {
+            _text.canvas.sortingOrder = (int) UILayer.DebugInfo;
+        }
         void Update()
         {
             UpdateFps();

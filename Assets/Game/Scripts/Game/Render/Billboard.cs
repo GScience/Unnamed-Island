@@ -5,8 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Game.Render
+namespace Island.Game.Render
 {
+    /// <summary>
+    /// 用来显示BillBoard效果
+    /// </summary>
     [ExecuteAlways]
     class Billboard : MonoBehaviour
     {

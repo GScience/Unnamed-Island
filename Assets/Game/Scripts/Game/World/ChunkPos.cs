@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Game.World
+namespace Island.Game.World
 {
+    /// <summary>
+    /// 区块坐标
+    /// </summary>
     public struct ChunkPos
     {
         public int x;

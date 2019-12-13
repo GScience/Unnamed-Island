@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Game.Controller;
-using Game.World;
+using Island.Game.Controller;
+using Island.Game.World;
+using Island.UI;
 using UnityEngine;
 
-namespace Game.System
+namespace Island.Game.System
 {
+    /// <summary>
+    /// 游戏管理器
+    /// 负责管理所有控制器
+    /// </summary>
     [RequireComponent(typeof(DataManager), typeof(WorldManager), typeof(BlockTextureManager))]
     class GameManager : MonoBehaviour
     {
@@ -18,7 +23,10 @@ namespace Game.System
 
         public static PlayerController PlayerController { get; private set; }
 
-        public PlayerController playerController;
+        public static bool IsInitializing => WorldManager == null || WorldManager.IsInitializing;
+        public PlayerController playerController = null;
+
+        private Pannel _gameLoadingPannel;
 
         void Awake()
         {
@@ -26,6 +34,18 @@ namespace Game.System
             DataManager = GetComponent<DataManager>();
             WorldManager = GetComponent<WorldManager>();
             BlockTextureManager = GetComponent<BlockTextureManager>();
+        }
+
+        private void Update()
+        {
+            if (_gameLoadingPannel == null && IsInitializing)
+                _gameLoadingPannel = Pannel.Show("gameLoading");
+
+            if (!IsInitializing && _gameLoadingPannel != null)
+            {
+                _gameLoadingPannel.Close();
+                _gameLoadingPannel = null;
+            }
         }
     }
 }

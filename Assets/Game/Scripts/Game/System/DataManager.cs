@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Game.Data;
+using Island.Game.Data;
 using UnityEditor;
 using UnityEngine;
 
-namespace Game.System
+namespace Island.Game.System
 {
     /// <summary>
-    /// 游戏内容管理器，包括方块类型等信息。每个存档的游戏内容不保证一致
+    /// 游戏内容管理器，记录包括包括方块、物品类型等信息。
     /// </summary>
     public class DataManager : MonoBehaviour
     {

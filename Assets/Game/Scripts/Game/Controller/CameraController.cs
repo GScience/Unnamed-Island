@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cinemachine;
-using Game.System;
+using Island.Game.System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Game.Controller
+namespace Island.Game.Controller
 {
+    /// <summary>
+    /// 相机控制器
+    /// </summary>
     [RequireComponent(typeof(CinemachineVirtualCamera))]
     class CameraController : MonoBehaviour
     {

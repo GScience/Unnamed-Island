@@ -3,30 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Game.Data.Block;
-using Game.System;
+using Island.Game.Data.Blocks;
+using Island.Game.System;
 using UnityEngine;
 
-namespace Game.World
+namespace Island.Game.World
 {
-    public class NormalWorldGenerator : IWorldGenerator
+    /// <summary>
+    /// 世界生成器
+    /// </summary>
+    public class NormalWorldGenerator : WorldGenerator
     {
-        public readonly IBlock air = GameManager.DataManager.Get<IBlock>("island.block:air");
-        public readonly IBlock dirt = GameManager.DataManager.Get<IBlock>("island.block:dirt");
+        public IBlock air;
+        public IBlock dirt;
+        public IBlock grass;
 
-        public readonly Vector3Int chunkSize = GameManager.WorldManager.chunkSize;
+        protected override void Init()
+        {
+            air = dataManager.Get<IBlock>("island.block:air");
+            dirt = dataManager.Get<IBlock>("island.block:dirt");
+            grass = dataManager.Get<IBlock>("island.block:grass");
+        }
 
-        public void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks)
+        protected override void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks)
         {
             for (var x = 0; x < chunkSize.x; ++x)
                 for (var y = 0; y < chunkSize.y; ++y)
                     for (var z = 0; z < chunkSize.z; ++z)
                     {
-                        if (y > GetHeight(
+                        var height = GetHeight(
                                 x + chunkPos.x * chunkSize.x,
                                 z + chunkPos.z * chunkSize.z,
-                                chunkSize.y / 3 * 2))
+                                chunkSize.y / 3 * 2);
+
+                        if (y > height)
                             blocks[x, y, z].blockData = air;
+                        else if (y == height)
+                            blocks[x, y, z].blockData = grass;
                         else
                             blocks[x, y, z].blockData = dirt;
                     }

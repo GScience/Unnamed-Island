@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Game.System;
-using Game.World;
+using Island.Game.System;
+using Island.Game.World;
 using UnityEditor;
 using UnityEngine;
 
-namespace Game.Controller
+namespace Island.Game.Controller
 {
     [RequireComponent(typeof(CharacterController))]
     public abstract class Character : MonoBehaviour
@@ -24,8 +24,11 @@ namespace Game.Controller
 
         void Update()
         {
+            if (GameManager.IsInitializing)
+                return;
+
             var chunk = GetChunk(ChunkPos);
-            if (chunk == null || chunk.PhysicsReady != true)
+            if (chunk == null || chunk.IsPhysicsReady != true)
                 return;
 
             UpdateMovement();

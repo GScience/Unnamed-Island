@@ -5,8 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Game.Render
+namespace Island.Game.Render
 {
+    /// <summary>
+    /// 方块纹理
+    /// 通过BlockTextureManager创建
+    /// </summary>
     public struct BlockTexture
     {
         public float left;

@@ -4,19 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Game.Data.Block;
-using Game.Render;
-using Game.System;
+using Island.Game.Data.Blocks;
+using Island.Game.Render;
+using Island.Game.System;
 using UnityEngine;
 
-namespace Game.World
+namespace Island.Game.World
 {
+    /// <summary>
+    /// 区块容器
+    /// 用来在游戏中储存区块信息
+    /// </summary>
     public class ChunkContainer : MonoBehaviour
     {
         public Vector3 BlockSize { get; private set; } = Vector3.zero;
         public Vector3Int ChunkSize { get; private set; } = Vector3Int.zero;
 
-        public bool? PhysicsReady => _chunkMeshGenerator?.physicsReady;
+        public bool? IsPhysicsReady => _chunkMeshGenerator?.physicsReady;
 
         private ChunkMeshGenerator _chunkMeshGenerator;
         private Block[,,] _blocks;
@@ -115,7 +119,7 @@ namespace Game.World
             chunkPos.x = chunkX;
             chunkPos.z = chunkZ;
 
-            GameManager.WorldManager.WorldGenerator.GenChunk(chunkPos, ref _blocks);
+            GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
 
             name = "Chunk: " + chunkX + ", " + chunkZ;
             transform.position = new Vector3(chunkX * ChunkSize.x * BlockSize.x, 0, chunkZ * ChunkSize.z * BlockSize.z);
@@ -139,7 +143,7 @@ namespace Game.World
 
             _cts = new CancellationTokenSource();
 
-            _genChunkTask = new Task(() => GameManager.WorldManager.WorldGenerator.GenChunk(chunkPos, ref _blocks), _cts.Token);
+            _genChunkTask = new Task(() => GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks), _cts.Token);
             _genChunkTask.Start();
             await _genChunkTask;
 

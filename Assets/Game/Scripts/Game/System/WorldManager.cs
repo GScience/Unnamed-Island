@@ -1,18 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Game.Controller;
-using Game.Data.Block;
-using Game.Render;
-using Game.World;
+using Island.Game.Controller;
+using Island.Game.Data.Blocks;
+using Island.Game.Render;
+using Island.Game.World;
+using Island.UI;
+using Island.UI.Pannels;
+using Island.Utils;
 using UnityEngine;
 
-namespace Game.System
+namespace Island.Game.System
 {
+    /// <summary>
+    /// 世界管理器
+    /// 负责加载世界、自动加载Chunk等
+    /// </summary>
     public class WorldManager : MonoBehaviour
     {
+        /// <summary>
+        /// 标记是否在初始化（第一次初始化所有Chunk状态）
+        /// </summary>
+        public bool IsInitializing { get; private set; }
+
         public Vector3 blockSize = Vector3.one;
         public Vector3Int chunkSize = new Vector3Int(16, 32, 16);
         public int chunkPool = 100;
@@ -20,18 +33,9 @@ namespace Game.System
 
         public int sight = 2;
 
-        private IWorldGenerator _worldGenerator;
-        public IWorldGenerator WorldGenerator
-        {
-            get => _worldGenerator;
-            set
-            {
-                foreach (var chunkContainer in _chunkContainerPool)
-                    chunkContainer.Unload();
+        public Transform chunkParent;
 
-                _worldGenerator = value;
-            }
-        }
+        public int physicalReadyChunkCount = 0;
 
         // 寻找到的Chunk表
         /*
@@ -58,14 +62,32 @@ namespace Game.System
         private readonly List<ChunkContainer> _chunkContainerPool = new List<ChunkContainer>();
         private readonly Dictionary<ChunkPos, ChunkContainer> _chunkDict = new Dictionary<ChunkPos, ChunkContainer>();
 
+        private WorldInfo worldInfo;
+
+        public WorldLoader worldLoader;
+
         void Awake()
         {
+            worldInfo = FindObjectOfType<WorldInfo>();
+
+#if UNITY_EDITOR
+            if (worldInfo == null)
+            {
+                if (!IsWorldExists("_DEBUG-WORLD_"))
+                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(20, 20), () => LoadWorld("_DEBUG-WORLD_"));
+                else
+                    LoadWorld("_DEBUG-WORLD_");
+                enabled = false;
+                return;
+            }
+#endif
+            worldLoader.LoadWorld(worldInfo.worldPath);
             EnlargePool(chunkPool);
         }
 
         void Start()
         {
-            WorldGenerator = new NormalWorldGenerator();
+            IsInitializing = true;
         }
 
         void Update()
@@ -90,6 +112,8 @@ namespace Game.System
                 _chunkMap[x, y] = null;
 
             // 寻找在范围内的Chunk
+            physicalReadyChunkCount = 0;
+
             foreach (var container in _chunkContainerPool)
             {
                 if (!container.chunkPos.IsAvailable())
@@ -105,6 +129,9 @@ namespace Game.System
                 {
                     _chunkMap[xDis + sight, zDis + sight] = container;
                     container.enabled = true;
+
+                    if (container.IsPhysicsReady == true)
+                        ++physicalReadyChunkCount;
                 }
                 else
                 {
@@ -113,7 +140,11 @@ namespace Game.System
                 }
             }
 
-            // 已经全部加载完成
+            // 第一遍初始化是否完成
+            if (physicalReadyChunkCount == _chunkMap.Length)
+                IsInitializing = false;
+
+            // 周围Chunk已经全部分配好
             if (_chunkContainerPool.Count - _freeContainerList.Count == _chunkMap.Length)
                 return;
 
@@ -164,7 +195,9 @@ namespace Game.System
                 freeContainer.LoadAsync(chunkPos.x, chunkPos.z, () => _chunkDict[chunkPos] = freeContainer);
                 _chunkMap[x, z] = freeContainer;
 
-                return;
+                // 非初始化时一次只加载一个Chunk
+                if (!IsInitializing)
+                    return;
             }
         }
 
@@ -183,6 +216,7 @@ namespace Game.System
                 chunkObj.AddComponent<ChunkMeshGenerator>();
                 chunkObj.AddComponent<MeshCollider>();
 
+                chunkObj.transform.parent = chunkParent;
                 container.enabled = false;
                 container.SetSize(chunkSize, blockSize);
 
@@ -194,6 +228,53 @@ namespace Game.System
         public ChunkContainer GetChunk(ChunkPos chunkPos)
         {
             return !_chunkDict.TryGetValue(chunkPos, out var chunk) ? null : chunk;
+        }
+
+        /// <summary>
+        /// 创建世界
+        /// </summary>
+        /// <param name="worldName"></param>
+        /// <param name="worldSize"></param>
+        /// <param name="onFinish"></param>
+        public static void CreateWorld(string worldName, ChunkPos worldSize, Action onFinish = null)
+        {
+            var pannel = Pannel.Show("WorldCreating");
+            var worldCreatingPannel = pannel.GetComponent<WorldCreatingPannel>();
+
+            var worldGeneratorObj = new GameObject();
+            var worldGenerator = worldGeneratorObj.AddComponent<NormalWorldGenerator>();
+
+            worldGenerator.onStageChange += (string stage) =>
+            {
+                worldCreatingPannel.SetStage(stage);
+            };
+            worldGenerator.onLoaded += () =>
+            {
+                pannel.Close();
+                onFinish();
+            };
+
+            worldGenerator.Generate(worldName, worldSize, new Vector3(1, 0.25f, 1), new Vector3Int(16, 128, 16));
+        }
+
+        /// <summary>
+        /// 加载世界
+        /// </summary>
+        /// <param name="worldName"></param>
+        public static void LoadWorld(string worldPath)
+        {
+            var worldInfo = new GameObject("World info").AddComponent<WorldInfo>();
+            worldInfo.worldPath = worldPath;
+            worldInfo.chunkCount = new ChunkPos(20, 20);
+            worldInfo.chunkSize = new Vector3Int(16, 128, 16);
+            DontDestroyOnLoad(worldInfo);
+
+            SceneUtils.SwitchScene("Game/Scenes/Game");
+        }
+
+        public static bool IsWorldExists(string worldPath)
+        {
+            return Directory.Exists(Application.persistentDataPath + "/world/" + worldPath);
         }
     }
 }

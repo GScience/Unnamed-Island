@@ -1,18 +1,22 @@
 
-using Game.Controller;
+using Island.Game.Controller;
 using Spine.Unity;
 using UnityEngine;
 
-namespace Game.Controller
+namespace Island.Game.Controller
 {
+    /// <summary>
+    /// Íæ¼Ò¿ØÖÆÆ÷
+    /// </summary>
     class PlayerController : Character
     {
         public SkeletonAnimation skeletonAnim;
         private CharacterController _controller;
 
-        public float gravity = 98f;
+        private float _gravity = 9.8f;
 
-        public float speed;
+        public float gracityScale = 1;
+        public float speed = 1;
 
         private float _gravitySpeed;
 
@@ -35,7 +39,7 @@ namespace Game.Controller
         {
             if (!_controller.isGrounded)
             {
-                _gravitySpeed += gravity * Time.deltaTime;
+                _gravitySpeed += _gravity * gracityScale * Time.deltaTime;
                 _controller.Move(Vector3.down * _gravitySpeed * Time.deltaTime);
             }
             else
@@ -70,7 +74,7 @@ namespace Game.Controller
                 skeletonAnim.AnimationName = "Move";
             }
 
-            if (Input.GetKey(KeyCode.W))
+            if (!Input.GetKey(KeyCode.W))
             {
                 _controller.Move((Vector3) (rotateMatrix * Vector3.forward) * Time.deltaTime * speed);
                 skeletonAnim.AnimationName = "Move";
@@ -84,7 +88,7 @@ namespace Game.Controller
 
             if (!Input.GetKey(KeyCode.A) &&
                 !Input.GetKey(KeyCode.D) &&
-                !Input.GetKey(KeyCode.W) &&
+                Input.GetKey(KeyCode.W) &&
                 !Input.GetKey(KeyCode.S))
                 skeletonAnim.AnimationName = "Relax";
         }

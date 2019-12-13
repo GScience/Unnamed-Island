@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Game.Render;
+using Island.Game.Render;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
-namespace Game.System
+namespace Island.Game.System
 {
+    /// <summary>
+    /// 方块纹理管理器，负责记录方块的纹理信息
+    /// </summary>
     public class BlockTextureManager : MonoBehaviour
     {
         public List<Texture2D> textureList;
@@ -34,21 +37,21 @@ namespace Game.System
             var x = 0;
             var y = 0;
 
-            var maxHeight = 0;
+            var maxWidth = 0;
 
             foreach (var texture in textureList)
             {
                 // 超过水平范围
                 if (x + texture.width > BlocksTexture.width)
                 {
-                    x = 0;
-                    y += maxHeight;
+                    x += maxWidth;
+                    y = 0;
                 }
 
                 // 超过垂直范围
-                if (y + texture.height > BlocksTexture.height)
+                if (x + texture.width > BlocksTexture.width)
                 {
-                    Debug.LogError("Too big to the block texture manager");
+                    Debug.LogError("Too much to the block texture manager");
                     break;
                 }
 
@@ -58,8 +61,8 @@ namespace Game.System
 
                 BlocksTexture.SetPixels(x, y, texture.width, texture.height, texture.GetPixels());
 
-                //最大高度
-                maxHeight = Mathf.Max(maxHeight, texture.height);
+                //最大宽度
+                maxWidth = Mathf.Max(maxWidth, texture.width);
 
                 //储存纹理信息
                 _textureDict[texture.name.ToLower()] = new BlockTexture
@@ -71,7 +74,7 @@ namespace Game.System
                 };
 
                 //移动到下一个位置
-                x += texture.width;
+                y += texture.height;
             }
 
             BlocksTexture.Apply();
@@ -82,7 +85,7 @@ namespace Game.System
             if (string.IsNullOrEmpty(textureName))
                 return BlockTexture.empty;
 
-            if (!_textureDict.TryGetValue(textureName, out var texture))
+            if (!_textureDict.TryGetValue(textureName.ToLower(), out var texture))
                 Debug.LogError("Failed to find block texture " + textureName);
 
             return texture;
