@@ -18,6 +18,9 @@ namespace Island.Game.Controller
         public float gracityScale = 1;
         public float speed = 1;
 
+#if UNITY_EDITOR
+        public bool autoWalk;
+#endif
         private float _gravitySpeed;
 
         void Awake()
@@ -74,7 +77,11 @@ namespace Island.Game.Controller
                 skeletonAnim.AnimationName = "Move";
             }
 
-            if (Input.GetKey(KeyCode.W))
+            if (Input.GetKey(KeyCode.W)
+#if UNITY_EDITOR
+                || autoWalk
+#endif
+                )
             {
                 _controller.Move((Vector3) (rotateMatrix * Vector3.forward) * Time.deltaTime * speed);
                 skeletonAnim.AnimationName = "Move";
@@ -89,7 +96,11 @@ namespace Island.Game.Controller
             if (!Input.GetKey(KeyCode.A) &&
                 !Input.GetKey(KeyCode.D) &&
                 !Input.GetKey(KeyCode.W) &&
-                !Input.GetKey(KeyCode.S))
+                !Input.GetKey(KeyCode.S)
+#if UNITY_EDITOR
+                && !autoWalk
+#endif
+                )
                 skeletonAnim.AnimationName = "Relax";
         }
     }

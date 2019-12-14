@@ -15,9 +15,9 @@ namespace Island.Game.Controller
     {
         public ChunkPos ChunkPos => new ChunkPos(
             Mathf.FloorToInt(transform.position.x / 
-                (GameManager.WorldManager.chunkSize.x * GameManager.WorldManager.blockSize.x)), 
+                (GameManager.WorldManager.ChunkSize.x * GameManager.WorldManager.BlockSize.x)), 
             Mathf.FloorToInt(transform.position.z / 
-                (GameManager.WorldManager.chunkSize.z * GameManager.WorldManager.blockSize.z)));
+                (GameManager.WorldManager.ChunkSize.z * GameManager.WorldManager.BlockSize.z)));
 
         public ChunkContainer GetChunk(ChunkPos chunkPos)
         {
@@ -46,7 +46,8 @@ namespace Island.Game.Controller
             {
                 var character = (Character) serializedObject.targetObject;
 
-                GUILayout.Label("In Chunk: " + character.ChunkPos.x + character.ChunkPos.z);
+                if (!GameManager.IsInitializing)
+                    GUILayout.Label("In Chunk: " + character.ChunkPos.x + character.ChunkPos.z);
                 base.OnInspectorGUI();
             }
         }

@@ -4936,7 +4936,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perfabs:
   - {fileID: 3525633857620319834, guid: 0692d260733f4c64a87ce7bd48a66a40, type: 3}
-  - {fileID: 5090068273742249264, guid: 26c5c9c56276b5243aa4c6163306a2a0, type: 3}
 --- !u!4 &91245483
 Transform:
   m_ObjectHideFlags: 0
@@ -5922,13 +5921,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4607a625f090d3e49a8e466046754530, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockSize: {x: 1, y: 0.25, z: 1}
-  chunkSize: {x: 16, y: 128, z: 16}
   chunkPool: 100
   worldAnchor: {fileID: 1383004603}
   sight: 4
   chunkParent: {fileID: 18489477}
   physicalReadyChunkCount: 0
+  isLoadingChunk: 0
+  worldInfo: {fileID: 0}
   worldLoader: {fileID: 664156985}
 --- !u!114 &1038840896
 MonoBehaviour:
@@ -6575,6 +6574,7 @@ MonoBehaviour:
   skeletonAnim: {fileID: 1849632141}
   gracityScale: 1
   speed: 2
+  autoWalk: 0
 --- !u!114 &1383004603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6701,14 +6701,14 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'FPS = 3
+  m_Text: 'FPS = 0
 
-    Update per second = 3
+    Update per second = 0
 
-    Memory = 555MB/1659MB
+    Memory = 359MB/887MB
 
     Free
-    Memory = 1104MB
+    Memory = 528MB
 
     Probably performance problem found = 0
 

@@ -31,6 +31,8 @@ namespace Island
         public float maxFpsChangePercent = 0.2f;
         public float maxUpsChangePercent = 0.4f;
 
+        private float _deltaTime = 0;
+
         void Awake()
         {
             _text = GetComponent<Text>();
@@ -44,6 +46,13 @@ namespace Island
         void Update()
         {
             UpdateFps();
+
+            _deltaTime += Time.deltaTime;
+
+            if (_deltaTime < 1)
+                return;
+
+            _deltaTime = 0;
 
             _text.text =
                 $"FPS = {(int)_fps}\n" +

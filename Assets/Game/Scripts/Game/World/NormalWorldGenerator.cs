@@ -20,22 +20,22 @@ namespace Island.Game.World
 
         protected override void Init()
         {
-            air = new Air();
-            dirt = new Dirt();
-            grass = new Grass();
+            air = GameManager.DataManager.Get<IBlock>("island.block:air");
+            dirt = GameManager.DataManager.Get<IBlock>("island.block:dirt");
+            grass = GameManager.DataManager.Get<IBlock>("island.block:grass");
         }
 
-        protected override void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks)
+        public override void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks)
         {
-            for (var x = 0; x < chunkSize.x; ++x)
-                for (var z = 0; z < chunkSize.z; ++z)
+            for (var x = 0; x < worldInfo.chunkSize.x; ++x)
+                for (var z = 0; z < worldInfo.chunkSize.z; ++z)
                 {
                     var height = GetHeight(
-                        x + chunkPos.x * chunkSize.x,
-                        z + chunkPos.z * chunkSize.z,
-                        chunkSize.y / 3 * 2);
+                        x + chunkPos.x * worldInfo.chunkSize.x,
+                        z + chunkPos.z * worldInfo.chunkSize.z,
+                        worldInfo.chunkSize.y / 3 * 2);
 
-                    for (var y = 0; y < chunkSize.y; ++y)
+                    for (var y = 0; y < worldInfo.chunkSize.y; ++y)
                     {
                         if (y > height)
                             blocks[x, y, z].blockData = air;

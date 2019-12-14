@@ -24,10 +24,11 @@ namespace Island.Game.System
         /// <summary>
         /// 标记是否在初始化（第一次初始化所有Chunk状态）
         /// </summary>
-        public bool IsInitializing { get; private set; }
+        public bool IsInitializing { get; private set; } = true;
 
-        public Vector3 blockSize = Vector3.one;
-        public Vector3Int chunkSize = new Vector3Int(16, 32, 16);
+        public Vector3 BlockSize => worldInfo.blockSize;
+        public Vector3Int ChunkSize => worldInfo.chunkSize;
+
         public int chunkPool = 100;
         public Anchor worldAnchor;
 
@@ -36,6 +37,7 @@ namespace Island.Game.System
         public Transform chunkParent;
 
         public int physicalReadyChunkCount = 0;
+        public bool isLoadingChunk = false;
 
         // 寻找到的Chunk表
         /*
@@ -62,9 +64,10 @@ namespace Island.Game.System
         private readonly List<ChunkContainer> _chunkContainerPool = new List<ChunkContainer>();
         private readonly Dictionary<ChunkPos, ChunkContainer> _chunkDict = new Dictionary<ChunkPos, ChunkContainer>();
 
-        private WorldInfo worldInfo;
+        public WorldInfo worldInfo;
 
         public WorldLoader worldLoader;
+        public WorldGenerator worldGenerator { get; private set; }
 
         void Awake()
         {
@@ -73,7 +76,10 @@ namespace Island.Game.System
             if (worldInfo == null)
             {
                 if (!IsWorldExists("_DEBUG-WORLD_"))
-                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(20, 20), () => LoadWorld("_DEBUG-WORLD_"));
+                {
+                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(100, 100));
+                    LoadWorld("_DEBUG-WORLD_");
+                }
                 else
                     LoadWorld("_DEBUG-WORLD_");
                 enabled = false;
@@ -81,12 +87,9 @@ namespace Island.Game.System
             }
 
             worldLoader.LoadWorld(worldInfo.worldPath);
+            var worldGeneratorType = Type.GetType(worldInfo.worldGeneratorType);
+            worldGenerator = (WorldGenerator) new GameObject().AddComponent(worldGeneratorType);
             EnlargePool(chunkPool);
-        }
-
-        void Start()
-        {
-            IsInitializing = true;
         }
 
         void Update()
@@ -217,7 +220,7 @@ namespace Island.Game.System
 
                 chunkObj.transform.parent = chunkParent;
                 container.enabled = false;
-                container.SetSize(chunkSize, blockSize);
+                container.SetSize(ChunkSize, BlockSize);
 
                 _chunkContainerPool.Add(container);
                 containerList.Add(container);
@@ -235,25 +238,13 @@ namespace Island.Game.System
         /// <param name="worldName"></param>
         /// <param name="worldSize"></param>
         /// <param name="onFinish"></param>
-        public static void CreateWorld(string worldName, ChunkPos worldSize, Action onFinish = null)
+        public static void CreateWorld(string worldName, ChunkPos worldSize)
         {
-            var pannel = Pannel.Show("WorldCreating");
-            var worldCreatingPannel = pannel.GetComponent<WorldCreatingPannel>();
-
             var worldGeneratorObj = new GameObject();
             var worldGenerator = worldGeneratorObj.AddComponent<NormalWorldGenerator>();
 
-            worldGenerator.onStageChange += (string stage) =>
-            {
-                worldCreatingPannel.SetStage(stage);
-            };
-            worldGenerator.onLoaded += () =>
-            {
-                pannel.Close();
-                onFinish();
-            };
-
-            worldGenerator.Generate(worldName, worldSize, new Vector3(2, 0.25f, 2), new Vector3Int(16, 128, 16));
+            worldGenerator.Generate(worldName, worldSize, new Vector3(1, 0.25f, 1), new Vector3Int(16, 128, 16));
+            Destroy(worldGeneratorObj);
         }
 
         /// <summary>
@@ -264,8 +255,6 @@ namespace Island.Game.System
         {
             var worldInfo = new GameObject("World info").AddComponent<WorldInfo>();
             worldInfo.worldPath = worldPath;
-            worldInfo.chunkCount = new ChunkPos(20, 20);
-            worldInfo.chunkSize = new Vector3Int(16, 128, 16);
             DontDestroyOnLoad(worldInfo);
 
             SceneUtils.SwitchScene("Game/Scenes/Game");
