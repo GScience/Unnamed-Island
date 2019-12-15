@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Island.Game.Data.Blocks;
+using Island.Game.Entitys;
 using Island.Game.System;
 using UnityEngine;
 
@@ -27,6 +28,7 @@ namespace Island.Game.World
 
         public override void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks)
         {
+            // 生成地形
             for (var x = 0; x < worldInfo.chunkSize.x; ++x)
                 for (var z = 0; z < worldInfo.chunkSize.z; ++z)
                 {
@@ -45,6 +47,22 @@ namespace Island.Game.World
                             blocks[x, y, z].blockData = dirt;
                     }
                 }
+        }
+        public override void GenChunkEntity(ChunkPos chunkPos, EntityContainer entityContainer)
+        {
+            var envElement = entityContainer.Add<EnvElement>();
+        }
+
+        public override void GenGlobalEntity(string entityName, EntityData entityData)
+        {
+            switch (entityName)
+            {
+                case "Player":
+                    entityData.Set("position", new Vector3(16, 100, 16));
+                    break;
+                default:
+                    break;
+            }
         }
 
         public int GetHeight(int x, int z, float maxHeight, float scale = 1 / 50.0f)

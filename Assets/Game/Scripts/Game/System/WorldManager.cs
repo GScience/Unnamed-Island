@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.Controller;
+using Island.Game.Entitys;
 using Island.Game.Data.Blocks;
 using Island.Game.Render;
 using Island.Game.World;
@@ -21,6 +22,8 @@ namespace Island.Game.System
     /// </summary>
     public class WorldManager : MonoBehaviour
     {
+        private const string DebugWorldName = "_DEBUG-WORLD_" + "191215.1";
+
         /// <summary>
         /// 标记是否在初始化（第一次初始化所有Chunk状态）
         /// </summary>
@@ -62,12 +65,16 @@ namespace Island.Game.System
         private List<ChunkContainer> _freeContainerList = new List<ChunkContainer>();
 
         private readonly List<ChunkContainer> _chunkContainerPool = new List<ChunkContainer>();
-        private readonly Dictionary<ChunkPos, ChunkContainer> _chunkDict = new Dictionary<ChunkPos, ChunkContainer>();
+        private readonly ConcurrentDictionary<ChunkPos, ChunkContainer> _chunkDict = new ConcurrentDictionary<ChunkPos, ChunkContainer>();
+
+        private bool _isLoadingTask;
 
         public WorldInfo worldInfo;
 
         public WorldLoader worldLoader;
         public WorldGenerator worldGenerator { get; private set; }
+
+        public EntityContainer globalEntityContainer;
 
         void Awake()
         {
@@ -92,6 +99,25 @@ namespace Island.Game.System
             EnlargePool(chunkPool);
         }
 
+        private void Start()
+        {
+            worldLoader.LoadEntity(globalEntityContainer);
+        }
+
+        private void OnDisable()
+        {
+            if (globalEntityContainer.IsLoaded)
+                worldLoader.SaveEntity(globalEntityContainer);
+
+            foreach (var chunk in _chunkContainerPool)
+                chunk.Unload();
+        }
+
+        private void OnApplicationQuit()
+        {
+            enabled = false;
+        }
+
         void Update()
         {
             UpdateChunk();
@@ -105,7 +131,7 @@ namespace Island.Game.System
             if (_chunkMap == null || _chunkMap.Length != (int) Mathf.Pow(sight * 2 + 1, 2))
                 _chunkMap = new ChunkContainer[sight * 2 + 1, sight * 2 + 1];
 
-            var centerPos = worldAnchor.GetComponent<Character>().ChunkPos;
+            var centerPos = worldAnchor.GetComponent<Entity>().ChunkPos;
 
             _freeContainerList.Clear();
 
@@ -150,6 +176,10 @@ namespace Island.Game.System
             if (_chunkContainerPool.Count - _freeContainerList.Count == _chunkMap.Length)
                 return;
 
+            // 正在加载chunk
+            if (_isLoadingTask)
+                return;
+
             // 排序
             _freeContainerList.Sort((container1, container2) =>
             {
@@ -181,26 +211,32 @@ namespace Island.Game.System
             });
 
             for (var x = 0; x < sight * 2 + 1; ++x)
-            for (var z = 0; z < sight * 2 + 1; ++z)
-            {
-                if (_chunkMap[x, z] != null)
-                    continue;
+                for (var z = 0; z < sight * 2 + 1; ++z)
+                {
+                    if (_chunkMap[x, z] != null)
+                        continue;
 
-                if (_freeContainerList.Count == 0)
-                    EnlargePool(1, ref _freeContainerList);
+                    if (_freeContainerList.Count == 0)
+                        EnlargePool(1, ref _freeContainerList);
                 
-                var freeContainer = _freeContainerList[0];
-                _chunkDict.Remove(freeContainer.chunkPos);
-                _freeContainerList.RemoveAt(0);
-                
-                var chunkPos = new ChunkPos(centerPos.x + x - sight, centerPos.z + z - sight);
-                freeContainer.LoadAsync(chunkPos.x, chunkPos.z, () => _chunkDict[chunkPos] = freeContainer);
-                _chunkMap[x, z] = freeContainer;
+                    var freeContainer = _freeContainerList[0];
+                    _chunkDict.TryRemove(freeContainer.chunkPos, out var _);
+                    _freeContainerList.RemoveAt(0);
 
-                // 非初始化时一次只加载一个Chunk
-                if (!IsInitializing)
-                    return;
-            }
+                    var chunkPos = new ChunkPos(centerPos.x + x - sight, centerPos.z + z - sight);
+
+                    _isLoadingTask = true;
+                    freeContainer.LoadAsync(chunkPos.x, chunkPos.z, () =>
+                    {
+                        _chunkDict[chunkPos] = freeContainer;
+                        _isLoadingTask = false;
+                    });
+                    _chunkMap[x, z] = freeContainer;
+
+                    // 非初始化时一次只加载一个Chunk
+                    if (!IsInitializing)
+                        return;
+                }
         }
 
         void EnlargePool(int size)

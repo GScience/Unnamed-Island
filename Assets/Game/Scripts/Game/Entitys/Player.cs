@@ -1,14 +1,14 @@
 
-using Island.Game.Controller;
+using Island.Game.Entitys;
 using Spine.Unity;
 using UnityEngine;
 
-namespace Island.Game.Controller
+namespace Island.Game.Entitys
 {
     /// <summary>
     /// Íæ¼Ò¿ØÖÆÆ÷
     /// </summary>
-    class PlayerController : Character
+    class Player : Entity
     {
         public SkeletonAnimation skeletonAnim;
         private CharacterController _controller;

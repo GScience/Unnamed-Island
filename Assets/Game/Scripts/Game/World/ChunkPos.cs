@@ -26,5 +26,25 @@ namespace Island.Game.World
         }
 
         public static ChunkPos nonAvailable = new ChunkPos(int.MaxValue, int.MaxValue);
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public static bool operator ==(ChunkPos chunkPos1, ChunkPos chunkPos2)
+        {
+            return chunkPos1.x == chunkPos2.x && chunkPos1.z == chunkPos2.z;
+        }
+
+        public static bool operator !=(ChunkPos chunkPos1, ChunkPos chunkPos2)
+        {
+            return !(chunkPos1 == chunkPos2);
+        }
     }
 }

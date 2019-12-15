@@ -20,9 +20,6 @@ namespace Island.Game.World
     /// </summary>
     public class ChunkContainer : MonoBehaviour
     {
-        private static ConcurrentDictionary<ChunkPos, object> _loadedChunkLock 
-            = new ConcurrentDictionary<ChunkPos, object>();
-
         public Vector3 BlockSize { get; private set; } = Vector3.zero;
         public Vector3Int ChunkSize { get; private set; } = Vector3Int.zero;
 
@@ -40,6 +37,8 @@ namespace Island.Game.World
         private Task _genChunkTask;
         private Task _unloadTask;
 
+        public EntityContainer EntityContainer { get; private set; }
+
         public IBlock GetBlockData(int x, int y, int z)
         {
             if (x < 0 || y < 0 || z < 0 || x >= ChunkSize.x || y >= ChunkSize.y || z >= ChunkSize.z)
@@ -56,6 +55,13 @@ namespace Island.Game.World
             _blocks = new Block[chunkSize.x, chunkSize.y, chunkSize.z];
             ChunkSize = chunkSize;
             BlockSize = blockSize;
+        }
+
+        private void Awake()
+        {
+            var entityContainerObj = new GameObject("Entity Container");
+            entityContainerObj.transform.parent = transform;
+            EntityContainer = entityContainerObj.AddComponent<EntityContainer>();
         }
 
         public void Start()
@@ -104,17 +110,17 @@ namespace Island.Game.World
                 _chunkMeshGenerator.enabled = true;
         }
 
-        private void OnDestroy()
-        {
-            // 如果正在异步卸载则直接等待异步卸载
-            if (_unloadTask == null || _unloadTask.IsCompleted)
-                Unload();
-            else
-                _unloadTask.Wait();
-        }
-
         public Task UnloadAndSetChunkPosTask(ChunkPos newPos)
         {
+            if (_unloadTask != null && !_unloadTask.IsCompleted)
+            {
+                chunkPos = newPos;
+                _unloadTask.Wait();
+            }
+
+            // 保存实体
+            GameManager.WorldManager.worldLoader.SaveEntity(EntityContainer);
+
             var oldPos = chunkPos;
             chunkPos = newPos;
 
@@ -126,40 +132,24 @@ namespace Island.Game.World
                 if (!oldPos.IsAvailable())
                     return;
 
-                lock (_loadedChunkLock[oldPos])
-                    GameManager.WorldManager.worldLoader.SaveChunk(oldPos, _blocks);
+                GameManager.WorldManager.worldLoader.SaveChunk(oldPos, _blocks);
 
                 for (var x = 0; x < ChunkSize.x; ++x)
                     for (var y = 0; y < ChunkSize.y; ++y)
                         for (var z = 0; z < ChunkSize.z; ++z)
                             _blocks[x, y, z].blockData = null;
-
-                if (!_loadedChunkLock.TryRemove(oldPos, out var _))
-                    Debug.LogError("Failed to remove chunk");
             });
             task.Start();
+            _unloadTask = task;
             return task;
         }
 
         public void Unload()
         {
-            if (!chunkPos.IsAvailable())
-                return;
-
-            _chunkMeshGenerator.Unload();
-
-            lock (_loadedChunkLock[chunkPos])
-                GameManager.WorldManager.worldLoader.SaveChunk(chunkPos, _blocks);
-
-            if (!_loadedChunkLock.TryRemove(chunkPos, out var _))
-                Debug.LogError("Failed to remove chunk");
-
-            chunkPos = ChunkPos.nonAvailable;
-
-            for (var x = 0; x < ChunkSize.x; ++x)
-                for (var y = 0; y < ChunkSize.y; ++y)
-                    for (var z = 0; z < ChunkSize.z; ++z)
-                        _blocks[x, y, z].blockData = null;
+            if (_unloadTask == null || _unloadTask.IsCompleted)
+                UnloadAndSetChunkPosTask(ChunkPos.nonAvailable).Wait();
+            else
+                _unloadTask.Wait();
         }
 
         public void Load(int chunkX, int chunkZ)
@@ -170,16 +160,11 @@ namespace Island.Game.World
             chunkPos.x = chunkX;
             chunkPos.z = chunkZ;
 
-            object chunkLock;
+            // 加载实体
+            GameManager.WorldManager.worldLoader.LoadEntity(EntityContainer);
 
-            if (!_loadedChunkLock.TryGetValue(chunkPos, out chunkLock))
-            {
-                chunkLock = new object();
-                _loadedChunkLock[chunkPos] = chunkLock;
-            }
-
-            lock (chunkLock)
-                GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
+            // 加载区块
+            GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
 
             name = "Chunk: " + chunkX + ", " + chunkZ;
             transform.position = new Vector3(chunkX * ChunkSize.x * BlockSize.x, 0, chunkZ * ChunkSize.z * BlockSize.z);
@@ -209,14 +194,8 @@ namespace Island.Game.World
             name = "Chunk: " + chunkX + ", " + chunkZ;
             transform.position = new Vector3(chunkX * ChunkSize.x * BlockSize.x, 0, chunkZ * ChunkSize.z * BlockSize.z);
 
-            // 获取区块锁
-            object chunkLock;
-
-            if (!_loadedChunkLock.TryGetValue(chunkPos, out chunkLock))
-            {
-                chunkLock = new object();
-                _loadedChunkLock[chunkPos] = chunkLock;
-            }
+            // 加载实体
+            GameManager.WorldManager.worldLoader.LoadEntity(EntityContainer);
 
             // 等待卸载任务完成
             await _unloadTask;
@@ -226,15 +205,14 @@ namespace Island.Game.World
             // 加载Chunk
             _genChunkTask = new Task(() =>
             {
-                lock (chunkLock)
-                    GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
-
-                _isDirty = true;
-                onFinished?.Invoke();
+                GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
             }, _cts.Token);
 
             _genChunkTask.Start();
             await _genChunkTask;
+
+            _isDirty = true;
+            onFinished?.Invoke();
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.Controller;
+using Island.Game.Entitys;
 using Island.Game.World;
 using Island.UI;
 using UnityEngine;
@@ -21,10 +21,10 @@ namespace Island.Game.System
         public static WorldManager WorldManager { get; private set; }
         public static BlockTextureManager BlockTextureManager { get; private set; }
 
-        public static PlayerController PlayerController { get; private set; }
+        public static Player PlayerController { get; private set; }
 
         public static bool IsInitializing => WorldManager == null || WorldManager.IsInitializing;
-        public PlayerController playerController = null;
+        public Player playerController = null;
 
         private Pannel _gameLoadingPannel;
 
