@@ -51,6 +51,13 @@ namespace Island.Game.World
         public override void GenChunkEntity(ChunkPos chunkPos, EntityContainer entityContainer)
         {
             var envElement = entityContainer.Add<EnvElement>();
+
+            var height = GetHeight(
+                        chunkPos.x * worldInfo.chunkSize.x,
+                        chunkPos.z * worldInfo.chunkSize.z,
+                        worldInfo.chunkSize.y / 3 * 2);
+
+            envElement.entityData.Set("position", new Vector3(chunkPos.x * worldInfo.chunkSize.x, (height + 1) * worldInfo.blockSize.y, chunkPos.z * worldInfo.chunkSize.z));
         }
 
         public override void GenGlobalEntity(string entityName, EntityData entityData)

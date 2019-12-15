@@ -8,6 +8,7 @@ namespace Island.Game.Entitys
     /// <summary>
     /// Íæ¼Ò¿ØÖÆÆ÷
     /// </summary>
+    [RequireComponent(typeof(CharacterController))]
     class Player : Entity
     {
         public SkeletonAnimation skeletonAnim;

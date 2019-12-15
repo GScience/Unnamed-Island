@@ -63,7 +63,7 @@ namespace Island.Game.Entitys
             _dataLoader[type].save(writer, data);
         }
 
-        private Dictionary<string, object> _entityData = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _entityData = new Dictionary<string, object>();
 
         public Vector3 TryGetVector3(string key, Vector3 defaultValue)
         {

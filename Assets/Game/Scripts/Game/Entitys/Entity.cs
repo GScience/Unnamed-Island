@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace Island.Game.Entitys
 {
-    [RequireComponent(typeof(CharacterController))]
     public abstract class Entity : MonoBehaviour
     {
         public ChunkPos ChunkPos => new ChunkPos(
