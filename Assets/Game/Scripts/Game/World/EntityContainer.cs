@@ -75,6 +75,13 @@ namespace Island.Game.World
                 entity.transform.parent = null;
         }
 
+        public void Clear()
+        {
+            foreach (var entity in _entityList)
+                Destroy(entity.gameObject);
+            _entityList.Clear();
+        }
+
         public void SaveToEntityData()
         {
             foreach (var entity in _entityList)

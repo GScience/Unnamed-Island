@@ -82,13 +82,13 @@ namespace Island.Game.System
 
             if (worldInfo == null)
             {
-                if (!IsWorldExists("_DEBUG-WORLD_"))
+                if (!IsWorldExists(DebugWorldName))
                 {
-                    CreateWorld("_DEBUG-WORLD_", new ChunkPos(100, 100));
-                    LoadWorld("_DEBUG-WORLD_");
+                    CreateWorld(DebugWorldName, new ChunkPos(100, 100));
+                    LoadWorld(DebugWorldName);
                 }
                 else
-                    LoadWorld("_DEBUG-WORLD_");
+                    LoadWorld(DebugWorldName);
                 enabled = false;
                 return;
             }

@@ -37,8 +37,8 @@ namespace Island.Game.World
         {
             var savePath = _dir + "e." + filePath + ".dat";
             var saveTmpPath = savePath + ".tmp";
-            var entityStream = File.Create(saveTmpPath);
-            var writer = new BinaryWriter(entityStream);
+            var entityMemoryStream = new MemoryStream();
+            var writer = new BinaryWriter(entityMemoryStream);
 
             // 保存实体
             entityContainer.SaveToEntityData();
@@ -57,6 +57,11 @@ namespace Island.Game.World
             }
 
             writer.Close();
+
+            var entityStream = File.Create(saveTmpPath);
+            var memoryBuffer = entityMemoryStream.GetBuffer();
+            entityStream.Write(memoryBuffer, 0, memoryBuffer.Length);
+
             entityStream.Close();
 
             // 复制文件
@@ -163,6 +168,7 @@ namespace Island.Game.World
             else
                 SaveEntity(entityContainer.chunkPos.x + "." + entityContainer.chunkPos.z, entityContainer);
         }
+
         /// <summary>
         /// 加载实体
         /// </summary>

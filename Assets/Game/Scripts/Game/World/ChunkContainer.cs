@@ -57,11 +57,16 @@ namespace Island.Game.World
             BlockSize = blockSize;
         }
 
-        private void Awake()
+        private EntityContainer CreateEntityContainer()
         {
             var entityContainerObj = new GameObject("Entity Container");
             entityContainerObj.transform.parent = transform;
-            EntityContainer = entityContainerObj.AddComponent<EntityContainer>();
+            return entityContainerObj.AddComponent<EntityContainer>();
+        }
+
+        private void Awake()
+        {
+            EntityContainer = CreateEntityContainer();
         }
 
         public void Start()
@@ -120,6 +125,9 @@ namespace Island.Game.World
 
             // 保存实体
             GameManager.WorldManager.worldLoader.SaveEntity(EntityContainer);
+
+            // 卸载实体容器
+            EntityContainer.Clear();
 
             var oldPos = chunkPos;
             chunkPos = newPos;

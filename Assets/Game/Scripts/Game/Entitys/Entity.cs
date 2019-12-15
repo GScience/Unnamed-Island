@@ -19,7 +19,7 @@ namespace Island.Game.Entitys
             Mathf.FloorToInt(transform.position.z / 
                 (GameManager.WorldManager.ChunkSize.z * GameManager.WorldManager.BlockSize.z)));
 
-        public EntityContainer Owner => transform.parent?.GetComponent<EntityContainer>();
+        public EntityContainer Owner { get; private set; }
         public EntityData entityData = new EntityData();
 
         public ChunkContainer GetChunk(ChunkPos chunkPos)
@@ -27,6 +27,10 @@ namespace Island.Game.Entitys
             return GameManager.WorldManager.GetChunk(chunkPos);
         }
 
+        private void Start()
+        {
+            Owner = transform.parent?.GetComponent<EntityContainer>();
+        }
         void Update()
         {
             // 初始化时不刷新实体
@@ -60,8 +64,12 @@ namespace Island.Game.Entitys
                 if (chunk != null)
                 {
                     Owner.Remove(this);
+                    Owner = null;
                     chunk.EntityContainer.Add(this);
                 }
+
+                // 更改所有权
+                Owner = transform.parent?.GetComponent<EntityContainer>();
             }
         }
 
