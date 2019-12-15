@@ -5893,7 +5893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPool: 150
   worldAnchor: {fileID: 1383004603}
-  sight: 3
+  sight: 4
   chunkParent: {fileID: 18489477}
   physicalReadyChunkCount: 0
   isLoadingChunk: 0
@@ -6654,7 +6654,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -6672,14 +6672,14 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'FPS = 0
+  m_Text: 'FPS = 4
 
-    Update per second = 0
+    Update per second = 4
 
-    Memory = 1217MB/1707MB
+    Memory = 850MB/1346MB
 
     Free
-    Memory = 490MB
+    Memory = 495MB
 
     Probably performance problem found = 1
 
