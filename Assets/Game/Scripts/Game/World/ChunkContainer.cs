@@ -130,7 +130,7 @@ namespace Island.Game.World
             if (chunkPos.IsAvailable())
             {
                 _chunkMeshGenerator.Unload();
-                EntityContainer.UnloadAsync();
+                unloadEntityTask = EntityContainer.UnloadAsync();
             }
 
             var oldPos = chunkPos;
@@ -173,11 +173,11 @@ namespace Island.Game.World
             chunkPos.x = chunkX;
             chunkPos.z = chunkZ;
 
-            // 加载实体
-            EntityContainer.LoadAsync().Wait();
-
             // 加载区块
             GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
+
+            // 加载实体
+            EntityContainer.LoadAsync().Wait();
 
             name = "Chunk: " + chunkX + ", " + chunkZ;
             transform.position = new Vector3(chunkX * ChunkSize.x * BlockSize.x, 0, chunkZ * ChunkSize.z * BlockSize.z);

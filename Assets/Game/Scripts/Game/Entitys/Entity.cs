@@ -38,7 +38,7 @@ namespace Island.Game.Entitys
         public EntityData GetEntityData()
         {
             if (_entityData == null)
-                _entityData = EntityData.Empty;
+                _entityData = EntityData.Empty();
             SaveToEntityData();
 
             return _entityData;

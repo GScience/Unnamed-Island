@@ -50,25 +50,37 @@ namespace Island.Game.World
         }
         public override void GenChunkEntity(ChunkPos chunkPos, ref List<EntityData> entityData)
         {
-            var height = GetHeight(
-                        chunkPos.x * worldInfo.chunkSize.x,
-                        chunkPos.z * worldInfo.chunkSize.z,
+            for (var x = 0; x < 16; x += 4)
+            {
+                for (var z = 0; z < 16; z += 4)
+                {
+                    var height = GetHeight(
+                        chunkPos.x * worldInfo.chunkSize.x + x,
+                        chunkPos.z * worldInfo.chunkSize.z + z,
                         worldInfo.chunkSize.y / 3 * 2);
 
-            var pos = new Vector3(chunkPos.x * worldInfo.chunkSize.x, (height + 1) * worldInfo.blockSize.y, chunkPos.z * worldInfo.chunkSize.z);
+                    var pos = new Vector3(
+                        chunkPos.x * worldInfo.chunkSize.x + (x + 0.5f) * worldInfo.blockSize.x, 
+                        height * worldInfo.blockSize.y, 
+                        chunkPos.z * worldInfo.chunkSize.z + (z + 0.5f) * worldInfo.blockSize.z);
 
-            var envElement = new EntityData(
-                "EnvElement",
-                typeof(EnvElement), 
-                new Dictionary<string, object>
-                {
-                    { 
-                        "position", pos 
-                    }
+                    var envElement = new EntityData(
+                        "EnvElement",
+                        typeof(EnvElement),
+                        new Dictionary<string, object>
+                        {
+                            {
+                                "position", pos
+                            },
+                            {
+                                "envElement", "island.env_element:withered_grass"
+                            }
+                        }
+                        );
+
+                    entityData.Add(envElement);
                 }
-                );
-
-            entityData.Add(envElement);
+            }
         }
 
         public override void GenGlobalEntity(ref List<EntityData> globalEntityList)

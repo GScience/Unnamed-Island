@@ -22,7 +22,7 @@ namespace Island.Game.System
     /// </summary>
     public class WorldManager : MonoBehaviour
     {
-        private const string DebugWorldName = "_DEBUG-WORLD_" + "191215.1";
+        private const string DebugWorldName = "_DEBUG-WORLD_" + "191217.1";
 
         /// <summary>
         /// 标记是否在初始化（第一次初始化所有Chunk状态）
@@ -234,8 +234,8 @@ namespace Island.Game.System
                     _chunkMap[x, z] = freeContainer;
 
                     // 非初始化时一次只加载一个Chunk
-                    if (!IsInitializing)
-                        return;
+                    /*if (!IsInitializing)*/
+                    return;
                 }
         }
 

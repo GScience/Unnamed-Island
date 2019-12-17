@@ -80,13 +80,13 @@ namespace Island.Game.World
                 Destroy(entity.gameObject);
 
             _entityList.Clear();
-            _entityDataList.Clear();
 
             var pos = chunkPos;
 
             var saveTask = new Task(() =>
             {
                 GameManager.WorldManager.worldLoader.SaveEntity(pos, _entityDataList);
+                _entityDataList.Clear();
             });
             saveTask.Start();
             return saveTask;
@@ -122,7 +122,6 @@ namespace Island.Game.World
         {
             if (!_entityList.Remove(entity))
             {
-                Debug.DebugBreak();
                 Debug.LogError("Entity not found in container");
             }
             else

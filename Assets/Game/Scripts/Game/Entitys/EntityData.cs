@@ -133,6 +133,9 @@ namespace Island.Game.Entitys
         public string EntityName => Get<string>("name");
         public string EntityType => Get<string>("type");
 
-        public static EntityData Empty = new EntityData("", typeof(Entity));
+        public static EntityData Empty()
+        {
+            return new EntityData("", typeof(Entity));
+        }
     }
 }

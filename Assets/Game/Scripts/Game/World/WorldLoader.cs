@@ -37,8 +37,8 @@ namespace Island.Game.World
         {
             var savePath = _dir + "e." + filePath + ".dat";
             var saveTmpPath = savePath + ".tmp";
-            var entityMemoryStream = new MemoryStream();
-            var writer = new BinaryWriter(entityMemoryStream);
+            var entityStream = File.Create(saveTmpPath);
+            var writer = new BinaryWriter(entityStream);
 
             // 保存实体
             writer.Write(entityDataList.Count);
@@ -49,11 +49,6 @@ namespace Island.Game.World
             }
 
             writer.Close();
-
-            var entityStream = File.Create(saveTmpPath);
-            var memoryBuffer = entityMemoryStream.GetBuffer();
-            entityStream.Write(memoryBuffer, 0, memoryBuffer.Length);
-
             entityStream.Close();
 
             // 复制文件
@@ -81,7 +76,7 @@ namespace Island.Game.World
         /// <param name="entitys"></param>
         public void LoadEntity(ChunkPos chunkPos, ref List<EntityData> entityDataList)
         {
-            var entityDataName = chunkPos.IsAvailable() ? chunkPos.x + "x" + chunkPos.z : "global";
+            var entityDataName = chunkPos.IsAvailable() ? chunkPos.x + "." + chunkPos.z : "global";
 
             var loadPath = _dir + "e." + entityDataName + ".dat";
 
@@ -103,7 +98,7 @@ namespace Island.Game.World
 
             for (var i = 0; i < entityCount; ++i)
             {
-                var entityData = EntityData.Empty;
+                var entityData = EntityData.Empty();
                 entityData.Load(reader);
                 entityDataList.Add(entityData);
             }

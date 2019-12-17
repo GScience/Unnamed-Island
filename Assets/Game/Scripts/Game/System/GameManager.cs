@@ -20,17 +20,22 @@ namespace Island.Game.System
         public static DataManager DataManager { get; private set; }
         public static WorldManager WorldManager { get; private set; }
         public static BlockTextureManager BlockTextureManager { get; private set; }
+        public static SpriteDatabase EnvElementSpriteDatabase { get; private set; }
 
         public static Player PlayerController { get; private set; }
 
         public static bool IsInitializing => WorldManager == null || WorldManager.IsInitializing;
         public Player playerController = null;
 
+        public SpriteDatabase envElementSpriteDatabase;
+
         private Pannel _gameLoadingPannel;
 
         void Awake()
         {
             PlayerController = playerController;
+            EnvElementSpriteDatabase = envElementSpriteDatabase;
+
             DataManager = GetComponent<DataManager>();
             WorldManager = GetComponent<WorldManager>();
             BlockTextureManager = GetComponent<BlockTextureManager>();
