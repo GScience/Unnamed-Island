@@ -8,8 +8,16 @@ using UnityEngine;
 
 namespace Island.Game.Entitys
 {
+    /// <summary>
+    /// 实体数据类型
+    /// </summary>
     public class EntityData
     {
+        #region DataLoader
+        /// <summary>
+        /// 实体数据类型加载器
+        /// 负责处理特定类型的读取和保存
+        /// </summary>
         private class DataLoader
         {
             public Action<BinaryWriter, object> save;
@@ -22,15 +30,26 @@ namespace Island.Game.Entitys
             }
         }
 
+        /// <summary>
+        /// 数据加载器索引
+        /// </summary>
         private static readonly Dictionary<Type, DataLoader> _dataLoader = new Dictionary<Type, DataLoader>();
+
+        /// <summary>
+        /// 数据类型索引
+        /// </summary>
         private static readonly Dictionary<string, Type> _dataTypeIndex = new Dictionary<string, Type> 
         {
             { typeof(Vector3).FullName, typeof(Vector3) },
             { typeof(string).FullName, typeof(string) }
         };
 
+        /// <summary>
+        /// 初始化数据加载器
+        /// </summary>
         static EntityData()
         {
+            // Vector3
             _dataLoader[typeof(Vector3)] = new DataLoader(
                 (BinaryWriter writer, object obj) =>
                 {
@@ -48,6 +67,7 @@ namespace Island.Game.Entitys
                     return new Vector3(x, y, z);
                 });
 
+            // string
             _dataLoader[typeof(string)] = new DataLoader(
                 (BinaryWriter writer, object obj) =>
                 {
@@ -60,6 +80,11 @@ namespace Island.Game.Entitys
                 });
         }
 
+        /// <summary>
+        /// 从二进制流中加载一个数据
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         private static object LoadValue(BinaryReader reader)
         {
             var typeName = reader.ReadString();
@@ -69,6 +94,11 @@ namespace Island.Game.Entitys
             return _dataLoader[type].load(reader);
         }
 
+        /// <summary>
+        /// 写入数据到二进制流中
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="data"></param>
         private static void SaveValue(BinaryWriter writer, object data)
         {
             var type = data.GetType();
@@ -76,8 +106,22 @@ namespace Island.Game.Entitys
             _dataLoader[type].save(writer, data);
         }
 
+        #endregion
+
+        #region EntityData
+
+        /// <summary>
+        /// 数据值
+        /// </summary>
         private readonly Dictionary<string, object> _entityData = new Dictionary<string, object>();
 
+        /// <summary>
+        /// 获取值，失败则返回给定值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public T TryGet<T>(string key, T defaultValue)
         {
             if (_entityData.TryGetValue(key, out var value) && value.GetType() == typeof(T))
@@ -85,6 +129,12 @@ namespace Island.Game.Entitys
             return defaultValue;
         }
 
+        /// <summary>
+        /// 获取值，失败则返回默认值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public T Get<T>(string key)
         {
             if (_entityData.TryGetValue(key, out var value) && value.GetType() == typeof(T))
@@ -92,11 +142,20 @@ namespace Island.Game.Entitys
             return default(T);
         }
 
+        /// <summary>
+        /// 设置值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
         public void Set(string key, object obj)
         {
             _entityData[key] = obj;
         }
 
+        /// <summary>
+        /// 保存EntityData到流中
+        /// </summary>
+        /// <param name="writer"></param>
         public void Save(BinaryWriter writer)
         {
             writer.Write((short)_entityData.Count);
@@ -108,6 +167,10 @@ namespace Island.Game.Entitys
             }
         }
 
+        /// <summary>
+        /// 从流中加载EntityData
+        /// </summary>
+        /// <param name="reader"></param>
         public void Load(BinaryReader reader)
         {
             var count = reader.ReadInt16();
@@ -137,5 +200,6 @@ namespace Island.Game.Entitys
         {
             return new EntityData("", typeof(Entity));
         }
+        #endregion
     }
 }

@@ -104,6 +104,8 @@ namespace Island.Game.World
 
             if (_chunkMeshGenerator != null) 
                 _chunkMeshGenerator.enabled = false;
+
+            EntityContainer.gameObject.SetActive(false);
         }
 
         void OnEnable()
@@ -113,6 +115,8 @@ namespace Island.Game.World
 
             if (_chunkMeshGenerator != null)
                 _chunkMeshGenerator.enabled = true;
+
+            EntityContainer.gameObject.SetActive(true);
         }
 
         public Task UnloadAndSetChunkPosTask(ChunkPos newPos)
@@ -142,7 +146,7 @@ namespace Island.Game.World
                 if (!oldPos.IsAvailable())
                     return;
 
-                GameManager.WorldManager.worldLoader.SaveChunk(oldPos, _blocks);
+                GameManager.WorldManager.worldLoader.SaveChunkBlock(oldPos, _blocks);
 
                 for (var x = 0; x < ChunkSize.x; ++x)
                     for (var y = 0; y < ChunkSize.y; ++y)
@@ -174,7 +178,7 @@ namespace Island.Game.World
             chunkPos.z = chunkZ;
 
             // 加载区块
-            GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
+            GameManager.WorldManager.worldLoader.LoadChunkBlock(chunkPos, ref _blocks);
 
             // 加载实体
             EntityContainer.LoadAsync().Wait();
@@ -215,7 +219,7 @@ namespace Island.Game.World
             // 加载Chunk
             _genChunkTask = new Task(() =>
             {
-                GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
+                GameManager.WorldManager.worldLoader.LoadChunkBlock(chunkPos, ref _blocks);
             }, _cts.Token);
 
             _genChunkTask.Start();

@@ -18,7 +18,7 @@ namespace Island.Game.System
 {
     /// <summary>
     /// 世界管理器
-    /// 负责加载世界、自动加载Chunk等
+    /// 负责自动加载Chunk等
     /// </summary>
     public class WorldManager : MonoBehaviour
     {
@@ -29,51 +29,79 @@ namespace Island.Game.System
         /// </summary>
         public bool IsInitializing { get; private set; } = true;
 
+        /// <summary>
+        /// 方块的大小
+        /// </summary>
         public Vector3 BlockSize => worldInfo.blockSize;
+        /// <summary>
+        /// 区块的大小
+        /// </summary>
         public Vector3Int ChunkSize => worldInfo.chunkSize;
 
+        /// <summary>
+        /// 区块池
+        /// </summary>
         public int chunkPool = 100;
+        /// <summary>
+        /// 世界锚
+        /// </summary>
         public Anchor worldAnchor;
 
+        /// <summary>
+        /// 视野
+        /// </summary>
         public int sight = 2;
 
+        /// <summary>
+        /// 创建的区块容器的父对象
+        /// </summary>
         public Transform chunkParent;
 
-        public int physicalReadyChunkCount = 0;
-        public bool isLoadingChunk = false;
+        /// <summary>
+        /// 物理计算完成的区块数量
+        /// </summary>
+        private int _physicalReadyChunkCount = 0;
 
-        // 寻找到的Chunk表
-        /*
-         *  -----------
-         * 4| | | | | |
-         *  -----------
-         *  -----------
-         * 3| | | | | |
-         *  -----------
-         *  -----------
-         * 2| | | | | |
-         *  -----------
-         *  -----------
-         * 1| | | | | |
-         *  -----------
-         *  -----------
-         * 0| | | | | |
-         *  -----------
-         *   0 1 2 3 4
-         */
+        /// <summary>
+        /// 区块图，记录使用的区块
+        /// </summary>
         private ChunkContainer[,] _chunkMap;
+        /// <summary>
+        /// 空闲区块列表
+        /// </summary>
         private List<ChunkContainer> _freeContainerList = new List<ChunkContainer>();
 
+        /// <summary>
+        /// 区块池
+        /// </summary>
         private readonly List<ChunkContainer> _chunkContainerPool = new List<ChunkContainer>();
+        /// <summary>
+        /// 区块字典，用于查摘区块
+        /// </summary>
         private readonly ConcurrentDictionary<ChunkPos, ChunkContainer> _chunkDict = new ConcurrentDictionary<ChunkPos, ChunkContainer>();
 
-        private bool _isLoadingTask;
+        /// <summary>
+        /// 是否有区块加载任务
+        /// </summary>
+        private bool _hasLoadingTask;
 
+        /// <summary>
+        /// 世界信息
+        /// </summary>
         public WorldInfo worldInfo;
 
+        /// <summary>
+        /// 世界加载器（为了支持老版本加入）
+        /// </summary>
         public WorldLoader worldLoader;
+        /// <summary>
+        /// 世界生成器
+        /// </summary>
         public WorldGenerator worldGenerator { get; private set; }
 
+        /// <summary>
+        /// 实体容器
+        /// </summary>
         public EntityContainer globalEntityContainer;
 
         void Awake()
@@ -140,7 +168,7 @@ namespace Island.Game.System
                 _chunkMap[x, y] = null;
 
             // 寻找在范围内的Chunk
-            physicalReadyChunkCount = 0;
+            _physicalReadyChunkCount = 0;
 
             foreach (var container in _chunkContainerPool)
             {
@@ -159,7 +187,7 @@ namespace Island.Game.System
                     container.enabled = true;
 
                     if (container.IsPhysicsReady == true)
-                        ++physicalReadyChunkCount;
+                        ++_physicalReadyChunkCount;
                 }
                 else
                 {
@@ -169,7 +197,7 @@ namespace Island.Game.System
             }
 
             // 第一遍初始化是否完成
-            if (physicalReadyChunkCount == _chunkMap.Length)
+            if (_physicalReadyChunkCount == _chunkMap.Length)
                 IsInitializing = false;
 
             // 周围Chunk已经全部分配好
@@ -177,7 +205,7 @@ namespace Island.Game.System
                 return;
 
             // 正在加载chunk
-            if (_isLoadingTask)
+            if (_hasLoadingTask)
                 return;
 
             // 排序
@@ -225,11 +253,11 @@ namespace Island.Game.System
 
                     var chunkPos = new ChunkPos(centerPos.x + x - sight, centerPos.z + z - sight);
 
-                    _isLoadingTask = true;
+                    _hasLoadingTask = true;
                     freeContainer.LoadAsync(chunkPos.x, chunkPos.z, () =>
                     {
                         _chunkDict[chunkPos] = freeContainer;
-                        _isLoadingTask = false;
+                        _hasLoadingTask = false;
                     });
                     _chunkMap[x, z] = freeContainer;
 

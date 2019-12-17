@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Island.Game.Entitys
 {
     /// <summary>
-    /// 玩家控制器
+    /// 玩家实体
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     class Player : Entity

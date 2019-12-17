@@ -11,6 +11,10 @@ using UnityEngine;
 
 namespace Island.Game.World
 {
+    /// <summary>
+    /// 世界加载器
+    /// 用来加载区块方块，实体等
+    /// </summary>
     public class WorldLoader : MonoBehaviour
     {
         private string _dir = "";
@@ -83,8 +87,14 @@ namespace Island.Game.World
             // 如果未创建实体信息则生成
             if (!File.Exists(loadPath))
             {
+                var worldSize = GameManager.WorldManager.worldInfo.worldSize;
                 if (chunkPos.IsAvailable())
-                    GameManager.WorldManager.worldGenerator.GenChunkEntity(chunkPos, ref entityDataList);
+                {
+                    if (
+                        !(chunkPos.x < 0 || chunkPos.x > worldSize.x || 
+                        chunkPos.z < 0 || chunkPos.z > worldSize.z))
+                        GameManager.WorldManager.worldGenerator.GenChunkEntity(chunkPos, ref entityDataList);
+                }
                 else
                     GameManager.WorldManager.worldGenerator.GenGlobalEntity(ref entityDataList);
                 return;
@@ -107,7 +117,7 @@ namespace Island.Game.World
             entityStream.Close();
         }
 
-        public void SaveChunk(ChunkPos chunkPos, Block[,,] blocks)
+        public void SaveChunkBlock(ChunkPos chunkPos, Block[,,] blocks)
         {
             if (_dir == "")
             {
@@ -157,7 +167,7 @@ namespace Island.Game.World
             File.Delete(saveTmpPath);
         }
 
-        public void LoadChunk(ChunkPos chunkPos, ref Block[,,] blocks)
+        public void LoadChunkBlock(ChunkPos chunkPos, ref Block[,,] blocks)
         {
             if (_dir == "")
             {

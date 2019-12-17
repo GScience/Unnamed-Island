@@ -8,6 +8,10 @@ using UnityEngine;
 
 namespace Island.Game.Data.EnvElements
 {
+    /// <summary>
+    /// 环境元素数据基类
+    /// 用来通过SpriteName自动优化获取Sprite
+    /// </summary>
     public abstract class EnvElementBase : IEnvElement
     {
         private Sprite _sprite;

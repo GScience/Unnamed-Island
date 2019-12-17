@@ -1,6 +1,7 @@
 ﻿using Island.Game.Entitys;
 using Island.Game.System;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEditor;
@@ -10,7 +11,9 @@ namespace Island.Game.World
 {
     /// <summary>
     /// 实体容器
-    /// 全局实体容器由WorldManager管理，Chunk实体容器由ChunkContainer管理
+    /// 世界管理器负责管理管理全局实体容器
+    /// Chunk会各自管理与其关联的实体容器
+    /// 除全局实体容器外，其他容器都不会由世界管理器直接控制
     /// </summary>
     public class EntityContainer : MonoBehaviour
     {
@@ -63,10 +66,11 @@ namespace Island.Game.World
             foreach (var entity in _entityList)
                 _entityDataList.Add(entity.GetEntityData());
 
-            GameManager.WorldManager.worldLoader.SaveEntity(chunkPos, _entityDataList);
-
             foreach (var entity in _entityList)
                 Destroy(entity.gameObject);
+
+            GameManager.WorldManager.worldLoader.SaveEntity(chunkPos, _entityDataList);
+
             _entityList.Clear();
             _entityDataList.Clear();
         }
@@ -128,12 +132,12 @@ namespace Island.Game.World
                 entity.transform.parent = null;
         }
 
-        public void Update()
+        IEnumerator DirtyContainerUpdateCorutine()
         {
-            if (!_isDirty)
-                return;
-
             IsLoaded = true;
+            _isDirty = false;
+
+            var updateCount = 0;
 
             if (IsGlobalContainer)
             {
@@ -142,6 +146,12 @@ namespace Island.Game.World
                 {
                     var entity = _entityList.Find((Entity e) => e.gameObject.name == entityData.EntityName);
                     entity.SetEntityData(entityData);
+                    ++updateCount;
+                    if (updateCount > 10)
+                    {
+                        updateCount = 0;
+                        yield return 1;
+                    }
                 }
             }
             else
@@ -153,12 +163,22 @@ namespace Island.Game.World
                     var entityType = Type.GetType(entityTypeName);
                     var entity = Create(entityType);
                     entity.SetEntityData(entityData);
+
+                    if (updateCount > 5)
+                    {
+                        updateCount = 0;
+                        yield return 1;
+                    }
                 }
             }
 
             _entityDataList.Clear();
+        }
 
-            _isDirty = false;
+        public void Update()
+        {
+            if (_isDirty)
+                StartCoroutine(DirtyContainerUpdateCorutine());
         }
 
 #if UNITY_EDITOR

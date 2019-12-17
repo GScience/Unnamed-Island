@@ -14,8 +14,14 @@ namespace Island.Game.System
     /// </summary>
     public class BlockTextureManager : MonoBehaviour
     {
+        /// <summary>
+        /// 纹理列表
+        /// </summary>
         public List<Texture2D> textureList;
 
+        /// <summary>
+        /// 纹理索引
+        /// </summary>
         private readonly Dictionary<string, BlockTexture> _textureDict = new Dictionary<string, BlockTexture>();
         public Texture2D BlocksTexture { get; private set; }
         public Material BlocksMaterial { get; private set; }

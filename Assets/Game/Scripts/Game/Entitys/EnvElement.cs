@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace Island.Game.Entitys
 {
+    /// <summary>
+    /// 环境元素实体
+    /// </summary>
     [RequireComponent(typeof(SpriteRenderer), typeof(Billboard))]
     public class EnvElement : Entity
     {
