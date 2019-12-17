@@ -101,13 +101,13 @@ namespace Island.Game.System
 
         private void Start()
         {
-            worldLoader.LoadEntity(globalEntityContainer);
+            globalEntityContainer.LoadAsync().Wait();
         }
 
         private void OnDisable()
         {
             if (globalEntityContainer.IsLoaded)
-                worldLoader.SaveEntity(globalEntityContainer);
+                globalEntityContainer.Unload();
 
             foreach (var chunk in _chunkContainerPool)
                 chunk.Unload();

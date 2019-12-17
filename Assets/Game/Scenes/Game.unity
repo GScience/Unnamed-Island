@@ -6025,7 +6025,7 @@ GameObject:
   - component: {fileID: 1048123371}
   - component: {fileID: 1048123370}
   m_Layer: 5
-  m_Name: PerformanceInfo
+  m_Name: DebugLayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6639,7 +6639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dea57b6a3194bba4cbfd95a8f7e89092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxFpsChangePercent: 0.2
+  maxFpsChangePercent: 0.3
   maxUpsChangePercent: 0.4
 --- !u!114 &1630246228
 MonoBehaviour:
@@ -6654,7 +6654,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -6676,10 +6676,10 @@ MonoBehaviour:
 
     Update per second = 0
 
-    Memory = 992MB/1500MB
+    Memory = 1139MB/1600MB
 
     Free
-    Memory = 508MB
+    Memory = 460MB
 
     Probably performance problem found = 1
 

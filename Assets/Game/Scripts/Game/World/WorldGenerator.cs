@@ -20,8 +20,8 @@ namespace Island.Game.World
     public abstract class WorldGenerator : MonoBehaviour
     {
         public abstract void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks);
-        public abstract void GenChunkEntity(ChunkPos chunkPos, EntityContainer entityContainer);
-        public abstract void GenGlobalEntity(string entityName, EntityData entityData);
+        public abstract void GenChunkEntity(ChunkPos chunkPos, ref List<EntityData> entityData);
+        public abstract void GenGlobalEntity(ref List<EntityData> entityData);
 
         protected abstract void Init();
 

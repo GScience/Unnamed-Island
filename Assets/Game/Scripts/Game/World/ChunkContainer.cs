@@ -120,22 +120,24 @@ namespace Island.Game.World
             if (_unloadTask != null && !_unloadTask.IsCompleted)
             {
                 chunkPos = newPos;
-                _unloadTask.Wait();
+                return _unloadTask;
             }
 
             // 保存实体
-            GameManager.WorldManager.worldLoader.SaveEntity(EntityContainer);
+            Task unloadEntityTask = null;
 
-            // 卸载实体容器
-            EntityContainer.Clear();
+            // 卸载网格
+            if (chunkPos.IsAvailable())
+            {
+                _chunkMeshGenerator.Unload();
+                EntityContainer.UnloadAsync();
+            }
 
             var oldPos = chunkPos;
             chunkPos = newPos;
 
-            if (chunkPos.IsAvailable())
-                _chunkMeshGenerator.Unload();
-
-            var task = new Task(() =>
+            // 卸载Chunk
+            var unloadChunkTask = new Task(() =>
             {
                 if (!oldPos.IsAvailable())
                     return;
@@ -146,10 +148,13 @@ namespace Island.Game.World
                     for (var y = 0; y < ChunkSize.y; ++y)
                         for (var z = 0; z < ChunkSize.z; ++z)
                             _blocks[x, y, z].blockData = null;
+
+                // 等待实体卸载完成
+                unloadEntityTask?.Wait();
             });
-            task.Start();
-            _unloadTask = task;
-            return task;
+            unloadChunkTask.Start();
+            _unloadTask = unloadChunkTask;
+            return unloadChunkTask;
         }
 
         public void Unload()
@@ -169,7 +174,7 @@ namespace Island.Game.World
             chunkPos.z = chunkZ;
 
             // 加载实体
-            GameManager.WorldManager.worldLoader.LoadEntity(EntityContainer);
+            EntityContainer.LoadAsync().Wait();
 
             // 加载区块
             GameManager.WorldManager.worldLoader.LoadChunk(chunkPos, ref _blocks);
@@ -202,9 +207,6 @@ namespace Island.Game.World
             name = "Chunk: " + chunkX + ", " + chunkZ;
             transform.position = new Vector3(chunkX * ChunkSize.x * BlockSize.x, 0, chunkZ * ChunkSize.z * BlockSize.z);
 
-            // 加载实体
-            GameManager.WorldManager.worldLoader.LoadEntity(EntityContainer);
-
             // 等待卸载任务完成
             await _unloadTask;
 
@@ -217,7 +219,12 @@ namespace Island.Game.World
             }, _cts.Token);
 
             _genChunkTask.Start();
+
+            // 等待区块加载完成
             await _genChunkTask;
+
+            // 等待实体加载完成
+            await EntityContainer.LoadAsync();
 
             _isDirty = true;
             onFinished?.Invoke();

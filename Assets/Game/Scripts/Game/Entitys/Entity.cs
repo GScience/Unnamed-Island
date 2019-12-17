@@ -19,11 +19,29 @@ namespace Island.Game.Entitys
                 (GameManager.WorldManager.ChunkSize.z * GameManager.WorldManager.BlockSize.z)));
 
         public EntityContainer Owner { get; private set; }
-        public EntityData entityData = new EntityData();
+        protected EntityData _entityData;
 
         public ChunkContainer GetChunk(ChunkPos chunkPos)
         {
             return GameManager.WorldManager.GetChunk(chunkPos);
+        }
+
+        public void SetEntityData(EntityData entityData)
+        {
+            if (entityData.EntityType != GetType().FullName)
+                Debug.LogError("Wrong entity data set to entity");
+            _entityData = entityData;
+
+            LoadFromEntityData();
+        }
+
+        public EntityData GetEntityData()
+        {
+            if (_entityData == null)
+                _entityData = EntityData.Empty;
+            SaveToEntityData();
+
+            return _entityData;
         }
 
         private void Start()
@@ -36,13 +54,18 @@ namespace Island.Game.Entitys
             if (GameManager.IsInitializing)
                 return;
 
-            // 所在Chunk无效时不刷新实体
-            var chunk = GetChunk(ChunkPos);
-            if (chunk == null || chunk.IsPhysicsReady != true)
-                return;
+            if (transform.hasChanged)
+            {
+                transform.hasChanged = false;
 
-            // 刷新实体所有者
-            UpdateOwner();
+                // 刷新实体所有者
+                UpdateOwner();
+
+                // 所在Chunk无效时不刷新实体
+                var chunk = GetChunk(ChunkPos);
+                if (chunk == null || chunk.IsPhysicsReady != true)
+                    return;
+            }
 
             // 刷新实体移动
             UpdateMovement();
@@ -74,14 +97,17 @@ namespace Island.Game.Entitys
 
         protected abstract void UpdateMovement();
 
-        public virtual void SaveToEntityData()
+        protected virtual void SaveToEntityData()
         {
-            entityData.Set("position", transform.position);
+            _entityData.Set("type", GetType().FullName);
+            _entityData.Set("name", gameObject.name);
+            _entityData.Set("position", transform.position);
         }
 
-        public virtual void Refresh()
+        protected virtual void LoadFromEntityData()
         {
-            transform.position = entityData.TryGetVector3("position", transform.position);
+            transform.position = _entityData.TryGet("position", transform.position);
+            gameObject.name = _entityData.Get<string>("name");
         }
 
         public static T Create<T>(EntityContainer container, string entityName = null) where T : Entity
@@ -89,7 +115,7 @@ namespace Island.Game.Entitys
             if (container.IsGlobalContainer)
                 Debug.LogError("Can't create entity in a global entity container");
 
-            return (T) Create(container, typeof(T));
+            return (T) Create(container, typeof(T), entityName);
         }
 
         public static Entity Create(EntityContainer container, Type type, string entityName = null)

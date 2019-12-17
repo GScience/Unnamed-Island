@@ -24,8 +24,9 @@ namespace Island.Game.Entitys
 
         private static readonly Dictionary<Type, DataLoader> _dataLoader = new Dictionary<Type, DataLoader>();
         private static readonly Dictionary<string, Type> _dataTypeIndex = new Dictionary<string, Type> 
-        { 
-            { typeof(Vector3).FullName, typeof(Vector3) } 
+        {
+            { typeof(Vector3).FullName, typeof(Vector3) },
+            { typeof(string).FullName, typeof(string) }
         };
 
         static EntityData()
@@ -33,7 +34,7 @@ namespace Island.Game.Entitys
             _dataLoader[typeof(Vector3)] = new DataLoader(
                 (BinaryWriter writer, object obj) =>
                 {
-                    var data = (Vector3) obj;
+                    var data = (Vector3)obj;
                     writer.Write(data.x);
                     writer.Write(data.y);
                     writer.Write(data.z);
@@ -46,12 +47,24 @@ namespace Island.Game.Entitys
 
                     return new Vector3(x, y, z);
                 });
+
+            _dataLoader[typeof(string)] = new DataLoader(
+                (BinaryWriter writer, object obj) =>
+                {
+                    var data = (string)obj;
+                    writer.Write(data);
+                },
+                (BinaryReader reader) =>
+                {
+                    return reader.ReadString();
+                });
         }
 
         private static object LoadValue(BinaryReader reader)
         {
             var typeName = reader.ReadString();
-            var type = _dataTypeIndex[typeName];
+            if (!_dataTypeIndex.TryGetValue(typeName, out var type))
+                Debug.LogError("Unknown type " + typeName);
 
             return _dataLoader[type].load(reader);
         }
@@ -65,11 +78,18 @@ namespace Island.Game.Entitys
 
         private readonly Dictionary<string, object> _entityData = new Dictionary<string, object>();
 
-        public Vector3 TryGetVector3(string key, Vector3 defaultValue)
+        public T TryGet<T>(string key, T defaultValue)
         {
-            if (_entityData.TryGetValue(key, out var value))
-                return (Vector3)value;
+            if (_entityData.TryGetValue(key, out var value) && value.GetType() == typeof(T))
+                return (T)value;
             return defaultValue;
+        }
+
+        public T Get<T>(string key)
+        {
+            if (_entityData.TryGetValue(key, out var value) && value.GetType() == typeof(T))
+                return (T)value;
+            return default(T);
         }
 
         public void Set(string key, object obj)
@@ -99,5 +119,20 @@ namespace Island.Game.Entitys
                 _entityData[key] = value;
             }
         }
+
+        public EntityData(string name, Type type, Dictionary<string, object> args = null)
+        {
+            Set("name", name);
+            Set("type", type.FullName);
+
+            if (args != null)
+                foreach (var pair in args)
+                    Set(pair.Key, pair.Value);
+        }
+
+        public string EntityName => Get<string>("name");
+        public string EntityType => Get<string>("type");
+
+        public static EntityData Empty = new EntityData("", typeof(Entity));
     }
 }

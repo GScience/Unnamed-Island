@@ -48,28 +48,35 @@ namespace Island.Game.World
                     }
                 }
         }
-        public override void GenChunkEntity(ChunkPos chunkPos, EntityContainer entityContainer)
+        public override void GenChunkEntity(ChunkPos chunkPos, ref List<EntityData> entityData)
         {
-            var envElement = entityContainer.Add<EnvElement>();
-
             var height = GetHeight(
                         chunkPos.x * worldInfo.chunkSize.x,
                         chunkPos.z * worldInfo.chunkSize.z,
                         worldInfo.chunkSize.y / 3 * 2);
 
-            envElement.entityData.Set("position", new Vector3(chunkPos.x * worldInfo.chunkSize.x, (height + 1) * worldInfo.blockSize.y, chunkPos.z * worldInfo.chunkSize.z));
+            var pos = new Vector3(chunkPos.x * worldInfo.chunkSize.x, (height + 1) * worldInfo.blockSize.y, chunkPos.z * worldInfo.chunkSize.z);
+
+            var envElement = new EntityData(
+                "EnvElement",
+                typeof(EnvElement), 
+                new Dictionary<string, object>
+                {
+                    { 
+                        "position", pos 
+                    }
+                }
+                );
+
+            entityData.Add(envElement);
         }
 
-        public override void GenGlobalEntity(string entityName, EntityData entityData)
+        public override void GenGlobalEntity(ref List<EntityData> globalEntityList)
         {
-            switch (entityName)
-            {
-                case "Player":
-                    entityData.Set("position", new Vector3(16, 100, 16));
-                    break;
-                default:
-                    break;
-            }
+            var playerData = new EntityData("Player", typeof(Player));
+            playerData.Set("position", new Vector3(16, 100, 16));
+
+            globalEntityList.Add(playerData);
         }
 
         public int GetHeight(int x, int z, float maxHeight, float scale = 1 / 50.0f)
