@@ -47,6 +47,7 @@ namespace Island.Game.Render
         void Start()
         {
             _meshRenderer.material = GameManager.BlockTextureManager.BlocksMaterial;
+            _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         }
 
         void OnEnable()
