@@ -30,6 +30,12 @@ namespace Island.Game.Entitys
         /// </summary>
         public EntityContainer Owner { get; private set; }
 
+        protected bool HasUpdation
+        {
+            get => enabled;
+            set => enabled = value;
+        }
+
         /// <summary>
         /// 实体数据
         /// </summary>

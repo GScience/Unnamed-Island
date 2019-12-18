@@ -49,7 +49,7 @@ namespace Island
 
             _deltaTime += Time.deltaTime;
 
-            if (_deltaTime < 1)
+            if (_deltaTime < 2)
                 return;
 
             _deltaTime = 0;
@@ -75,7 +75,7 @@ namespace Island
 
             var currentRenderFrameCount = Time.renderedFrameCount;
 
-            if (_time >= 0.1f && currentRenderFrameCount - _totalRenderFrameCount >= 1 && _updateFrameCount > 1)
+            if (_time >= 1 && currentRenderFrameCount - _totalRenderFrameCount >= 1 && _updateFrameCount > 1)
             {
                 var fps = (currentRenderFrameCount - _totalRenderFrameCount) / _time;
                 var ups = _updateFrameCount / _time;

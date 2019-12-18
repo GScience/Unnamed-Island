@@ -34,6 +34,8 @@ namespace Island.Game.Entitys
             var envElementName = _entityData.Get<string>("envElement");
             envElement = GameManager.DataManager.Get<IEnvElement>(envElementName);
             _spriteRenderer.sprite = envElement?.GetEnvElementSprite();
+
+            HasUpdation = false;
         }
 
         private void Awake()

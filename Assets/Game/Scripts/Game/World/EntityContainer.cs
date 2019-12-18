@@ -29,6 +29,8 @@ namespace Island.Game.World
 
         private bool _isDirty;
 
+        private static int _entityUpdationCotourine = 0;
+
         private void Awake()
         {
             chunkContainer = GetComponentInParent<ChunkContainer>();
@@ -73,6 +75,9 @@ namespace Island.Game.World
 
             _entityList.Clear();
             _entityDataList.Clear();
+
+            StopAllCoroutines();
+            _entityUpdationCotourine = 0;
         }
 
         public Task UnloadAsync()
@@ -82,6 +87,8 @@ namespace Island.Game.World
 
             foreach (var entity in _entityList)
                 Destroy(entity.gameObject);
+
+            StopAllCoroutines();
 
             _entityList.Clear();
 
@@ -136,8 +143,9 @@ namespace Island.Game.World
         {
             IsLoaded = true;
             _isDirty = false;
+            ++_entityUpdationCotourine;
 
-            var updateCount = 0;
+            var entityAddCountInFrame = 0;
 
             if (IsGlobalContainer)
             {
@@ -146,12 +154,6 @@ namespace Island.Game.World
                 {
                     var entity = _entityList.Find((Entity e) => e.gameObject.name == entityData.EntityName);
                     entity.SetEntityData(entityData);
-                    ++updateCount;
-                    if (updateCount > 10)
-                    {
-                        updateCount = 0;
-                        yield return 1;
-                    }
                 }
             }
             else
@@ -164,21 +166,25 @@ namespace Island.Game.World
                     var entity = Create(entityType);
                     entity.SetEntityData(entityData);
 
-                    if (updateCount > 5)
+                    if (++entityAddCountInFrame > 3)
                     {
-                        updateCount = 0;
+                        entityAddCountInFrame = 0;
                         yield return 1;
                     }
                 }
             }
 
             _entityDataList.Clear();
+            --_entityUpdationCotourine;
         }
 
-        public void Update()
+        void Update()
         {
             if (_isDirty)
-                StartCoroutine(DirtyContainerUpdateCorutine());
+            {
+                if (_entityUpdationCotourine < 1)
+                    StartCoroutine(DirtyContainerUpdateCorutine());
+            }
         }
 
 #if UNITY_EDITOR

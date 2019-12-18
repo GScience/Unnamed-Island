@@ -22,7 +22,7 @@ namespace Island.Game.System
     /// </summary>
     public class WorldManager : MonoBehaviour
     {
-        private const string DebugWorldName = "_DEBUG-WORLD_" + "191217.1";
+        private const string DebugWorldName = "_DEBUG-WORLD_" + "191218.1";
 
         /// <summary>
         /// 标记是否在初始化（第一次初始化所有Chunk状态）

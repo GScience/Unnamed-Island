@@ -39,6 +39,11 @@ namespace Island.Game.Entitys
             _controller.enabled = false;
         }
 
+        protected override void LoadFromEntityData()
+        {
+            base.LoadFromEntityData();
+            HasUpdation = true;
+        }
         protected override void UpdateMovement()
         {
             if (!_controller.isGrounded)

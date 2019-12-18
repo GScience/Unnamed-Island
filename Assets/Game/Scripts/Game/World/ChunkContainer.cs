@@ -146,6 +146,9 @@ namespace Island.Game.World
                 if (!oldPos.IsAvailable())
                     return;
 
+                // 等待区块加载完成
+                _genChunkTask?.Wait();
+
                 GameManager.WorldManager.worldLoader.SaveChunkBlock(oldPos, _blocks);
 
                 for (var x = 0; x < ChunkSize.x; ++x)
@@ -163,6 +166,8 @@ namespace Island.Game.World
 
         public void Unload()
         {
+            _genChunkTask?.Wait();
+
             if (_unloadTask == null || _unloadTask.IsCompleted)
                 UnloadAndSetChunkPosTask(ChunkPos.nonAvailable).Wait();
             else

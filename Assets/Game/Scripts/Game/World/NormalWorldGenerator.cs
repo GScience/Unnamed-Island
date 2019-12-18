@@ -7,6 +7,7 @@ using Island.Game.Data.Blocks;
 using Island.Game.Entitys;
 using Island.Game.System;
 using UnityEngine;
+using Random = System.Random;
 
 namespace Island.Game.World
 {
@@ -18,6 +19,8 @@ namespace Island.Game.World
         public IBlock air;
         public IBlock dirt;
         public IBlock grass;
+
+        private Random _random = new Random();
 
         protected override void Init()
         {
@@ -50,36 +53,38 @@ namespace Island.Game.World
         }
         public override void GenChunkEntity(ChunkPos chunkPos, ref List<EntityData> entityData)
         {
-            for (var x = 0; x < 16; x += 4)
+            var count = _random.Next() % 50;
+
+            for (var i = 0; i < count; ++i)
             {
-                for (var z = 0; z < 16; z += 4)
-                {
-                    var height = GetHeight(
-                        chunkPos.x * worldInfo.chunkSize.x + x,
-                        chunkPos.z * worldInfo.chunkSize.z + z,
-                        worldInfo.chunkSize.y / 3 * 2);
+                var x = _random.Next() % 16;
+                var z = _random.Next() % 16;
 
-                    var pos = new Vector3(
-                        chunkPos.x * worldInfo.chunkSize.x + (x + 0.5f) * worldInfo.blockSize.x, 
-                        height * worldInfo.blockSize.y, 
-                        chunkPos.z * worldInfo.chunkSize.z + (z + 0.5f) * worldInfo.blockSize.z);
+                var height = GetHeight(
+                    chunkPos.x * worldInfo.chunkSize.x + x,
+                    chunkPos.z * worldInfo.chunkSize.z + z,
+                    worldInfo.chunkSize.y / 3 * 2);
 
-                    var envElement = new EntityData(
-                        "EnvElement",
-                        typeof(EnvElement),
-                        new Dictionary<string, object>
-                        {
+                var pos = new Vector3(
+                    chunkPos.x * worldInfo.chunkSize.x + (x + 0.5f) * worldInfo.blockSize.x,
+                    height * worldInfo.blockSize.y,
+                    chunkPos.z * worldInfo.chunkSize.z + (z + 0.5f) * worldInfo.blockSize.z);
+
+                var envElement = new EntityData(
+                    "EnvElement",
+                    typeof(EnvElement),
+                    new Dictionary<string, object>
+                    {
                             {
                                 "position", pos
                             },
                             {
                                 "envElement", "island.env_element:withered_grass"
                             }
-                        }
-                        );
+                    }
+                    );
 
-                    entityData.Add(envElement);
-                }
+                entityData.Add(envElement);
             }
         }
 
@@ -91,7 +96,7 @@ namespace Island.Game.World
             globalEntityList.Add(playerData);
         }
 
-        public int GetHeight(int x, int z, float maxHeight, float scale = 1 / 50.0f)
+        public int GetHeight(int x, int z, float maxHeight, float scale = 1 / 200.0f)
         {
             return (int)(Mathf.PerlinNoise(x * scale, z * scale) * maxHeight);
         }

@@ -299,16 +299,15 @@ namespace Island.Game.Render
 
             _mesh.Clear(false);
 
+            yield return 1;
+
             _mesh.SetVertices(_vertices);
+            _mesh.SetTriangles(_triangles, 0);
             _mesh.SetNormals(_normals);
             _mesh.SetUVs(0, _uvs);
-            _mesh.SetTriangles(_triangles, 0);
-            yield return 1;
-            /*_mesh.vertices = _vertices.ToArray();
-            _mesh.normals = _normals.ToArray();
-            _mesh.uv = _uvs.ToArray();
-            _mesh.triangles = _triangles.ToArray();*/
 
+            yield return 1;
+            
             _meshFilter.mesh = _mesh;
 
             yield return 1;
