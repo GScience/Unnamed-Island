@@ -129,7 +129,7 @@ namespace Island.Game.System
 
         private void Start()
         {
-            globalEntityContainer.LoadAsync().Wait();
+            globalEntityContainer.AsyncLoadTask().Wait();
         }
 
         private void OnDisable()
@@ -238,15 +238,41 @@ namespace Island.Game.System
                 return 0;
             });
 
-            for (var x = 0; x < sight * 2 + 1; ++x)
-                for (var z = 0; z < sight * 2 + 1; ++z)
+            // 一圈一圈加载
+            for (var loopSight = 0; loopSight <= sight; ++loopSight)
+            {
+                var sightWidth = loopSight * 2;
+
+                for (var i = 0; i <= (loopSight == 0 ? 1 : sightWidth * 4); ++i)
                 {
+                    var x = sight - loopSight;
+                    var z = sight - loopSight;
+
+                    if (i < sightWidth)
+                    {
+                        x += i;
+                    }
+                    else if (sightWidth <= i && i < sightWidth * 2)
+                    {
+                        x += sightWidth;
+                        z += i - sightWidth;
+                    }
+                    else if (sightWidth * 2 <= i && i < sightWidth * 3)
+                    {
+                        x += 3 * sightWidth - i;
+                        z += sightWidth;
+                    }
+                    else if (sightWidth * 3 <= i)
+                    {
+                        z += sightWidth * 4 - i;
+                    }
+
                     if (_chunkMap[x, z] != null)
                         continue;
 
                     if (_freeContainerList.Count == 0)
                         EnlargePool(1, ref _freeContainerList);
-                
+
                     var freeContainer = _freeContainerList[0];
                     _chunkDict.TryRemove(freeContainer.chunkPos, out var _);
                     _freeContainerList.RemoveAt(0);
@@ -265,6 +291,7 @@ namespace Island.Game.System
                     /*if (!IsInitializing)*/
                     return;
                 }
+            }
         }
 
         void EnlargePool(int size)

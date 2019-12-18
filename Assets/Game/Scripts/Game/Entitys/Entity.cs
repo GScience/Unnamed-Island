@@ -90,7 +90,7 @@ namespace Island.Game.Entitys
         void Update()
         {
             // 初始化时不刷新实体
-            if (GameManager.IsInitializing)
+            if (GameManager.IsInitializing || !Owner.IsLoaded)
                 return;
 
             // 玩家移动或者所在Chunk未加载时刷新所有者信息

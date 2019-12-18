@@ -39,6 +39,8 @@ namespace Island.Game.World
 
         public EntityContainer EntityContainer { get; private set; }
 
+        public bool IsLoaded { get; private set; }
+
         public IBlock GetBlockData(int x, int y, int z)
         {
             if (x < 0 || y < 0 || z < 0 || x >= ChunkSize.x || y >= ChunkSize.y || z >= ChunkSize.z)
@@ -127,6 +129,11 @@ namespace Island.Game.World
                 return _unloadTask;
             }
 
+            var needSave = IsLoaded;
+
+            IsLoaded = false;
+            _isDirty = false;
+
             // 保存实体
             Task unloadEntityTask = null;
 
@@ -134,7 +141,7 @@ namespace Island.Game.World
             if (chunkPos.IsAvailable())
             {
                 _chunkMeshGenerator.Unload();
-                unloadEntityTask = EntityContainer.UnloadAsync();
+                unloadEntityTask = EntityContainer.AsyncUnloadTask();
             }
 
             var oldPos = chunkPos;
@@ -149,7 +156,8 @@ namespace Island.Game.World
                 // 等待区块加载完成
                 _genChunkTask?.Wait();
 
-                GameManager.WorldManager.worldLoader.SaveChunkBlock(oldPos, _blocks);
+                if (needSave)
+                    GameManager.WorldManager.worldLoader.SaveChunkBlock(oldPos, _blocks);
 
                 for (var x = 0; x < ChunkSize.x; ++x)
                     for (var y = 0; y < ChunkSize.y; ++y)
@@ -186,12 +194,13 @@ namespace Island.Game.World
             GameManager.WorldManager.worldLoader.LoadChunkBlock(chunkPos, ref _blocks);
 
             // 加载实体
-            EntityContainer.LoadAsync().Wait();
+            EntityContainer.AsyncLoadTask().Wait();
 
             name = "Chunk: " + chunkX + ", " + chunkZ;
             transform.position = new Vector3(chunkX * ChunkSize.x * BlockSize.x, 0, chunkZ * ChunkSize.z * BlockSize.z);
 
             _isDirty = true;
+            IsLoaded = true;
         }
 
         public async void LoadAsync(int chunkX, int chunkZ, Action onFinished = null)
@@ -225,6 +234,7 @@ namespace Island.Game.World
             _genChunkTask = new Task(() =>
             {
                 GameManager.WorldManager.worldLoader.LoadChunkBlock(chunkPos, ref _blocks);
+                IsLoaded = true;
             }, _cts.Token);
 
             _genChunkTask.Start();
@@ -233,7 +243,7 @@ namespace Island.Game.World
             await _genChunkTask;
 
             // 等待实体加载完成
-            await EntityContainer.LoadAsync();
+            await EntityContainer.AsyncLoadTask();
 
             _isDirty = true;
             onFinished?.Invoke();

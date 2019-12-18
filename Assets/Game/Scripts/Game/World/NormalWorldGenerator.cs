@@ -53,7 +53,7 @@ namespace Island.Game.World
         }
         public override void GenChunkEntity(ChunkPos chunkPos, ref List<EntityData> entityData)
         {
-            var count = _random.Next() % 50;
+            var count = _random.Next() % 50 + 1;
 
             for (var i = 0; i < count; ++i)
             {

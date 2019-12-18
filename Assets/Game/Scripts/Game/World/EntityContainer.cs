@@ -3,6 +3,7 @@ using Island.Game.System;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -31,6 +32,10 @@ namespace Island.Game.World
 
         private static int _entityUpdationCotourine = 0;
 
+        private Task _unloadTask;
+        private Task _loadTask;
+        private CancellationTokenSource _cts;
+
         private void Awake()
         {
             chunkContainer = GetComponentInParent<ChunkContainer>();
@@ -50,56 +55,87 @@ namespace Island.Game.World
             }
         }
 
-        public Task LoadAsync()
+        public void Load()
         {
             var pos = chunkPos;
 
-            var saveTask = new Task(() =>
+            if (_unloadTask == null || _unloadTask.IsCompleted)
+                _unloadTask = AsyncUnloadTask();
+
+            if (_loadTask != null && !_loadTask.IsCompleted)
+                _cts.Cancel();
+
+            _unloadTask?.Wait();
+            _loadTask?.Wait();
+            GameManager.WorldManager.worldLoader.LoadEntity(pos, ref _entityDataList);
+            _isDirty = true;
+        }
+
+        public Task AsyncLoadTask()
+        {
+            var pos = chunkPos;
+
+            if (_unloadTask == null || _unloadTask.IsCompleted)
+                _unloadTask = AsyncUnloadTask();
+
+            if (_loadTask != null && !_loadTask.IsCompleted)
+                _cts.Cancel();
+
+            _cts = new CancellationTokenSource();
+
+            var loadTask = new Task(() =>
             {
+                _unloadTask.Wait();
                 GameManager.WorldManager.worldLoader.LoadEntity(pos, ref _entityDataList);
                 _isDirty = true;
-            });
-            saveTask.Start();
-            return saveTask;
+            }, _cts.Token);
+            loadTask.Start();
+            _loadTask = loadTask;
+            return loadTask;
         }
 
         public void Unload()
         {
+            if (_unloadTask != null && !_unloadTask.IsCompleted)
+                _unloadTask.Wait();
+            else
+                AsyncUnloadTask().Wait();
+        }
+
+        public Task AsyncUnloadTask()
+        {
+            if (_unloadTask != null && !_unloadTask.IsCompleted)
+                return _unloadTask;
+
+            var needSave = IsLoaded;
+
+            IsLoaded = false;
+            _isDirty = false;
+
             foreach (var entity in _entityList)
                 _entityDataList.Add(entity.GetEntityData());
 
-            foreach (var entity in _entityList)
-                Destroy(entity.gameObject);
+            if (!IsGlobalContainer)
+            {
+                foreach (var entity in _entityList)
+                    Destroy(entity.gameObject);
 
-            GameManager.WorldManager.worldLoader.SaveEntity(chunkPos, _entityDataList);
-
-            _entityList.Clear();
-            _entityDataList.Clear();
+                _entityList.Clear();
+            }
 
             StopAllCoroutines();
             _entityUpdationCotourine = 0;
-        }
-
-        public Task UnloadAsync()
-        {
-            foreach (var entity in _entityList)
-                _entityDataList.Add(entity.GetEntityData());
-
-            foreach (var entity in _entityList)
-                Destroy(entity.gameObject);
-
-            StopAllCoroutines();
-
-            _entityList.Clear();
 
             var pos = chunkPos;
 
             var saveTask = new Task(() =>
             {
-                GameManager.WorldManager.worldLoader.SaveEntity(pos, _entityDataList);
+                if (needSave)
+                    GameManager.WorldManager.worldLoader.SaveEntity(pos, _entityDataList);
                 _entityDataList.Clear();
             });
             saveTask.Start();
+            _unloadTask = saveTask;
             return saveTask;
         }
 
@@ -141,7 +177,6 @@ namespace Island.Game.World
 
         IEnumerator DirtyContainerUpdateCorutine()
         {
-            IsLoaded = true;
             _isDirty = false;
             ++_entityUpdationCotourine;
 
@@ -176,6 +211,8 @@ namespace Island.Game.World
 
             _entityDataList.Clear();
             --_entityUpdationCotourine;
+
+            IsLoaded = true;
         }
 
         void Update()
