@@ -13,5 +13,7 @@ namespace Island.Game.Data.EnvElements
     public interface IEnvElement : IData
     {
         Sprite GetEnvElementSprite();
+        float GetColliderSize();
+        Vector3 GetColliderCenter();
     }
 }

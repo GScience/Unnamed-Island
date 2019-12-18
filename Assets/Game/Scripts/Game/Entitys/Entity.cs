@@ -17,6 +17,19 @@ namespace Island.Game.Entitys
     public abstract class Entity : MonoBehaviour
     {
         /// <summary>
+        /// 所有Entity所在层
+        /// </summary>
+        public const int Layer = 8;
+
+        /// <summary>
+        /// 实体是否被选择
+        /// </summary>
+        public virtual bool IsSelected
+        {
+            set{}
+        }
+
+        /// <summary>
         /// 实体所在区块
         /// </summary>
         public ChunkPos ChunkPos => new ChunkPos(
@@ -30,6 +43,14 @@ namespace Island.Game.Entitys
         /// </summary>
         public EntityContainer Owner { get; private set; }
 
+        /// <summary>
+        /// 实体碰撞箱
+        /// </summary>
+        private SphereCollider _collider;
+
+        /// <summary>
+        /// 是否有刷新事件
+        /// </summary>
         protected bool HasUpdation
         {
             get => enabled;
@@ -108,7 +129,7 @@ namespace Island.Game.Entitys
 
             // 刷新实体移动
             if (_canMove)
-                UpdateMovement();
+                UpdateEntityState();
         }
 
         /// <summary>
@@ -138,7 +159,7 @@ namespace Island.Game.Entitys
             }
         }
 
-        protected abstract void UpdateMovement();
+        protected abstract void UpdateEntityState();
 
         protected virtual void SaveToEntityData()
         {
@@ -149,8 +170,23 @@ namespace Island.Game.Entitys
 
         protected virtual void LoadFromEntityData()
         {
+            gameObject.layer = Layer;
             transform.position = _entityData.TryGet("position", transform.position);
             gameObject.name = _entityData.Get<string>("name");
+        }
+
+        protected virtual void SetCollider(Vector3 pos, float size)
+        {
+            if (_collider == null)
+            {
+                _collider = gameObject.AddComponent<SphereCollider>();
+                _collider.isTrigger = true;
+                _collider.enabled = false;
+                _collider.radius = size;
+                _collider.center = pos;
+            }
+            if (size > 0)
+                _collider.enabled = true;
         }
 
         /// <summary>

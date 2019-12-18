@@ -1,6 +1,7 @@
 
 using Island.Game.Entitys;
 using Spine.Unity;
+using System;
 using UnityEngine;
 
 namespace Island.Game.Entitys
@@ -19,9 +20,13 @@ namespace Island.Game.Entitys
         public float gracityScale = 1;
         public float speed = 1;
 
+        public float interactSize = 1.0f;
+
 #if UNITY_EDITOR
         public bool autoWalk;
 #endif
+        private Entity _selectedEntity;
+
         private float _gravitySpeed;
 
         void Awake()
@@ -29,6 +34,10 @@ namespace Island.Game.Entitys
             _controller = GetComponent<CharacterController>();
         }
 
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(transform.position, interactSize);
+        }
         void OnEnable()
         {
             _controller.enabled = true;
@@ -44,8 +53,10 @@ namespace Island.Game.Entitys
             base.LoadFromEntityData();
             HasUpdation = true;
         }
-        protected override void UpdateMovement()
+        protected override void UpdateEntityState()
         {
+            UpdateSelectedEntity();
+
             if (!_controller.isGrounded)
             {
                 _gravitySpeed += _gravity * gracityScale * Time.deltaTime;
@@ -108,6 +119,64 @@ namespace Island.Game.Entitys
 #endif
                 )
                 skeletonAnim.AnimationName = "Relax";
+        }
+
+        private void UpdateSelectedEntity()
+        {
+            var overlapResult = Physics.OverlapSphere(
+                transform.position,
+                interactSize, 1 << Layer);
+
+            // 没有选择任何物体
+            if (overlapResult.Length <= 1)
+            {
+                if (_selectedEntity != null)
+                {
+                    _selectedEntity.IsSelected = false;
+                    _selectedEntity = null;
+                }
+            }
+            else
+            {
+                // 选择了物体
+                GameObject newSelectedObj = null;
+                Array.Sort(
+                    overlapResult, 
+                    (Collider collider1, Collider collider2) =>
+                    {
+                        var distance1 = Vector3.Distance(collider1.transform.position, transform.position);
+                        var distance2 = Vector3.Distance(collider2.transform.position, transform.position);
+
+                        if (distance1 > distance2)
+                            return 1;
+                        else if (distance1 < distance2)
+                            return -1;
+                        else
+                            return 0;
+                    });
+
+                foreach (var obj in overlapResult)
+                    if (obj.gameObject != gameObject)
+                    {
+                        newSelectedObj = obj.gameObject;
+                        break;
+                    }
+                var newSelectedEntity = newSelectedObj?.GetComponent<Entity>();
+
+                if (newSelectedEntity == null)
+                    return;
+
+                if (_selectedEntity != newSelectedObj)
+                {
+                    if (_selectedEntity != null)
+                        _selectedEntity.IsSelected = false;
+
+                    _selectedEntity = newSelectedEntity;
+
+                    if (_selectedEntity != null)
+                        _selectedEntity.IsSelected = true;
+                }
+            } 
         }
     }
 }

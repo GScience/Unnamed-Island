@@ -29,5 +29,8 @@ namespace Island.Game.Data.EnvElements
         {
             _sprite = GameManager.EnvElementSpriteDatabase.Get(GetSpriteName());
         }
+
+        public abstract float GetColliderSize();
+        public abstract Vector3 GetColliderCenter();
     }
 }

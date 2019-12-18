@@ -15,5 +15,15 @@ namespace Island.Game.Data.EnvElements
         {
             return "witheredGrass";
         }
+
+        public override float GetColliderSize()
+        {
+            return 0.6f;
+        }
+
+        public override Vector3 GetColliderCenter()
+        {
+            return new Vector3(0, 0.7f, 0);
+        }
     }
 }
