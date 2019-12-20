@@ -38,10 +38,12 @@ namespace Island.Game.World
         /// <summary>
         /// 数据类型索引
         /// </summary>
-        private static readonly Dictionary<string, Type> _dataTypeIndex = new Dictionary<string, Type> 
+        private static readonly Dictionary<int, Type> _dataTypeIndex = new Dictionary<int, Type> 
         {
-            { typeof(Vector3).FullName, typeof(Vector3) },
-            { typeof(string).FullName, typeof(string) }
+            { typeof(Vector3).Name.GetHashCode(), typeof(Vector3) },
+            { typeof(string).Name.GetHashCode(), typeof(string) },
+            { typeof(int).Name.GetHashCode(), typeof(int) },
+            { typeof(float).Name.GetHashCode(), typeof(float) }
         };
 
         /// <summary>
@@ -78,6 +80,30 @@ namespace Island.Game.World
                 {
                     return reader.ReadString();
                 });
+
+            // int 32
+            _dataLoader[typeof(int)] = new DataLoader(
+                (BinaryWriter writer, object obj) =>
+                {
+                    var data = (int)obj;
+                    writer.Write(data);
+                },
+                (BinaryReader reader) =>
+                {
+                    return reader.ReadInt32();
+                });
+
+            // float
+            _dataLoader[typeof(float)] = new DataLoader(
+                (BinaryWriter writer, object obj) =>
+                {
+                    var data = (float)obj;
+                    writer.Write(data);
+                },
+                (BinaryReader reader) =>
+                {
+                    return reader.ReadSingle();
+                });
         }
 
         /// <summary>
@@ -87,9 +113,9 @@ namespace Island.Game.World
         /// <returns></returns>
         private static object LoadValue(BinaryReader reader)
         {
-            var typeName = reader.ReadString();
-            if (!_dataTypeIndex.TryGetValue(typeName, out var type))
-                Debug.LogError("Unknown type " + typeName);
+            var typeIndex = reader.ReadInt32();
+            if (!_dataTypeIndex.TryGetValue(typeIndex, out var type))
+                Debug.LogError("Unknown type " + typeIndex);
 
             return _dataLoader[type].load(reader);
         }
@@ -102,7 +128,7 @@ namespace Island.Game.World
         private static void SaveValue(BinaryWriter writer, object data)
         {
             var type = data.GetType();
-            writer.Write(type.FullName); 
+            writer.Write(type.Name.GetHashCode()); 
             _dataLoader[type].save(writer, data);
         }
 

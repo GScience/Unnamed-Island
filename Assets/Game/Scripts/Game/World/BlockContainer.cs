@@ -105,11 +105,11 @@ namespace Island.Game.World
             if (_unloadTask != null && !_unloadTask.IsCompleted)
                 return _unloadTask;
 
-            IsLoaded = false;
-            _isDirty = false;
-
             var needSave = IsLoaded;
             var oldChunkPos = ChunkPos;
+
+            IsLoaded = false;
+            _isDirty = false;
 
             // 卸载Chunk
             _unloadTask = new Task(() =>

@@ -1,20 +1,21 @@
 
-using Island.Game.GlobalEntity;
+using Island.Game.EntityBehaviour;
 using Island.Game.World;
 using Spine.Unity;
 using System;
 using UnityEngine;
 
-namespace Island.Game.GlobalEntity
+namespace Island.Game.EntityBehaviour
 {
     /// <summary>
     /// Íæ¼ÒÊµÌå
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
-    class Player : Entity
+    class Player : MonoBehaviour
     {
         public SkeletonAnimation skeletonAnim;
         private CharacterController _controller;
+        private Entity _entity;
 
         private float _gravity = 9.8f;
 
@@ -33,6 +34,12 @@ namespace Island.Game.GlobalEntity
         void Awake()
         {
             _controller = GetComponent<CharacterController>();
+            _entity = GetComponent<Entity>();
+        }
+
+        void Start()
+        {
+            _entity.HasUpdation = true;
         }
 
         private void OnDrawGizmos()
@@ -49,12 +56,15 @@ namespace Island.Game.GlobalEntity
             _controller.enabled = false;
         }
 
-        protected override void LoadFromEntityData()
+        void EntityLoad(DataTag dataTag)
         {
-            base.LoadFromEntityData();
-            HasUpdation = true;
         }
-        protected override void UpdateEntityState()
+
+        void EntitySave(DataTag dataTag)
+        {
+        }
+
+        void EntityUpdate()
         {
             UpdateSelectedEntity();
 
@@ -66,7 +76,7 @@ namespace Island.Game.GlobalEntity
             else
                 _gravitySpeed = 0;
 
-            var cameraRot = Camera.main.transform.rotation;
+            var cameraRot = UnityEngine.Camera.main.transform.rotation;
             var cameraTotY = cameraRot.eulerAngles.y;
 
             var rotateMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(cameraTotY, Vector3.up));

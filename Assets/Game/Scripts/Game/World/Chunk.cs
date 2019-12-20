@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Island.Game.Proxy.Blocks;
-using Island.Game.GlobalEntity;
+using Island.Game.EntityBehaviour;
 using Island.Game.Render;
 using Island.Game.System;
 using Unity.Jobs;

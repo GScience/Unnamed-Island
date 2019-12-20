@@ -1,4 +1,4 @@
-﻿using Island.Game.GlobalEntity;
+﻿using Island.Game.EntityBehaviour;
 using Island.Game.System;
 using System;
 using System.Collections;
@@ -86,15 +86,18 @@ namespace Island.Game.World
             IsLoaded = false;
             _isDirty = false;
 
-            foreach (var entity in _entityList)
-                _entityDataList.Add(entity.GetEntityDataTag());
-
-            if (!IsGlobalContainer && ChunkPos.IsAvailable())
+            if (ChunkPos.IsAvailable())
             {
                 foreach (var entity in _entityList)
-                    Destroy(entity.gameObject);
+                    _entityDataList.Add(entity.GetEntityDataTag());
 
-                _entityList.Clear();
+                if (!IsGlobalContainer)
+                {
+                    foreach (var entity in _entityList)
+                        Destroy(entity.gameObject);
+
+                    _entityList.Clear();
+                }
             }
 
             StopAllCoroutines();
@@ -117,9 +120,9 @@ namespace Island.Game.World
             return _entityList;
         }
 
-        public Entity Create(string entityName = null)
+        public Entity Create(DataTag dataTag)
         {
-            return Entity.Create(this, entityName);
+            return Entity.Create(this, dataTag);
         }
 
         public void Add(Entity entity)
@@ -165,8 +168,7 @@ namespace Island.Game.World
                 // 非全局容器直接创建对象
                 foreach (var entityData in _entityDataList)
                 {
-                    var entity = Create(entityData.Get<string>("name"));
-                    entity.SetEntityData(entityData);
+                    var entity = Create(entityData);
 
                     if (++entityAddCountInFrame > 1)
                     {

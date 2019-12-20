@@ -26,9 +26,12 @@ namespace Island.Game.World
         /// <summary>
         /// 实体是否被选择
         /// </summary>
-        public virtual bool IsSelected
+        public bool IsSelected
         {
-            set{}
+            set
+            {
+                SendMessage("OnEntitySelectChange", value, SendMessageOptions.DontRequireReceiver);
+            }
         }
 
         /// <summary>
@@ -51,28 +54,24 @@ namespace Island.Game.World
         private SphereCollider _collider;
 
         /// <summary>
-        /// 实体代理
-        /// </summary>
-        public IEntity entityProxy;
-
-        /// <summary>
         /// 是否有刷新事件
         /// </summary>
-        protected bool HasUpdation
-        {
-            get => enabled;
-            set => enabled = value;
-        }
+        public bool HasUpdation { get; set; }
+
+        /// <summary>
+        /// 实体代理
+        /// </summary>
+        private IEntity _entityProxy;
+
+        /// <summary>
+        /// 实体行为
+        /// </summary>
+        private MonoBehaviour _entityBehaviour;
 
         /// <summary>
         /// 实体数据，用于序列化和反序列化
         /// </summary>
-        protected DataTag _entityDataTag = DataTag.Empty();
-
-        /// <summary>
-        /// 实体数据，用于代理
-        /// </summary>
-        protected dynamic _entityData = new ExpandoObject();
+        private DataTag _entityDataTag = DataTag.Empty();
 
         /// <summary>
         /// 是否可以移动
@@ -89,11 +88,6 @@ namespace Island.Game.World
             return GameManager.WorldManager.GetChunk(ChunkPos);
         }
 
-        public dynamic GetEntityData()
-        {
-            return _entityData;
-        }
-
         /// <summary>
         /// 设置实体数据
         /// </summary>
@@ -101,20 +95,23 @@ namespace Island.Game.World
         public void SetEntityData(DataTag entityData)
         {
             // 设置代理
-            var entityType = entityData.Get<string>("type");
+            var entityProxyName = entityData.Get<string>("type");
 
-            if (!string.IsNullOrEmpty(entityType))
-            {
-                entityProxy = GameManager.ProxyManager.Get<IEntity>(entityType);
-                HasUpdation = entityProxy.HasUpdation;
-            }
+            _entityProxy = GameManager.ProxyManager.Get<IEntity>(entityProxyName);
+            var entityBehaviourType = _entityProxy.GetEntityType();
+
+            // 尝试直接获取
+            _entityBehaviour = (MonoBehaviour)gameObject.GetComponent(entityBehaviourType);
+
+            // 创建
+            if (_entityBehaviour == null)
+                _entityBehaviour = (MonoBehaviour)gameObject.AddComponent(entityBehaviourType);
 
             // 同步标签
             _entityDataTag = entityData;
 
             // 加载
             LoadFromEntityData();
-            entityProxy?.Load(this, entityData);
         }
 
         /// <summary>
@@ -123,10 +120,7 @@ namespace Island.Game.World
         /// <returns></returns>
         public DataTag GetEntityDataTag()
         {
-            if (_entityData == null)
-                _entityData = DataTag.Empty();
             SaveToEntityDataTag();
-
             return _entityDataTag;
         }
 
@@ -155,11 +149,11 @@ namespace Island.Game.World
             }
 
             // 刷新实体移动
-            if (_canMove && HasUpdation)
-            {
-                entityProxy?.Update(this);
-                UpdateEntityState();
-            }
+            if (_canMove)
+                _entityBehaviour.SendMessage("EntityUpdate");
+
+            if (!HasUpdation)
+                enabled = false;
         }
 
         /// <summary>
@@ -189,23 +183,30 @@ namespace Island.Game.World
             }
         }
 
-        protected virtual void SaveToEntityDataTag()
+        private void SaveToEntityDataTag()
         {
+            if (_entityBehaviour == null)
+                return;
+
             // 代理类型
-            _entityDataTag.Set("type", entityProxy?.Name ?? "");
+            _entityDataTag.Set("type", _entityProxy?.Name ?? "");
             // 名称
             _entityDataTag.Set("name", gameObject.name);
             // 坐标
             _entityDataTag.Set("position", transform.position);
+
+            _entityBehaviour.SendMessage("EntitySave", _entityDataTag);
         }
 
-        protected virtual void LoadFromEntityData()
+        private void LoadFromEntityData()
         {
             transform.position = _entityDataTag.TryGet("position", transform.position);
             gameObject.name = _entityDataTag.Get<string>("name");
+
+            _entityBehaviour.SendMessage("EntityLoad", _entityDataTag);
         }
 
-        protected virtual void SetCollider(Vector3 pos, float size)
+        public void SetCollider(Vector3 pos, float size)
         {
             if (_collider == null)
             {
@@ -219,10 +220,6 @@ namespace Island.Game.World
                 _collider.enabled = true;
         }
 
-        protected virtual void UpdateEntityState()
-        {
-        }
-
         /// <summary>
         /// 实例化实体
         /// </summary>
@@ -230,14 +227,16 @@ namespace Island.Game.World
         /// <param name="type"></param>
         /// <param name="entityName"></param>
         /// <returns></returns>
-        public static Entity Create(EntityContainer container, string entityName = null)
+        public static Entity Create(EntityContainer container, DataTag dataTag)
         {
-            var entityObj = new GameObject(entityName == null ? "Entity" : entityName);
+            var entityObj = new GameObject(dataTag.Get<string>("name"));
             entityObj.layer = Layer;
 
             var entity = entityObj.AddComponent<Entity>();
             container.Add(entity);
             entity.Owner = container;
+
+            entity.SetEntityData(dataTag);
 
             return entity;
         }
@@ -252,8 +251,6 @@ namespace Island.Game.World
                 if (!GameManager.IsInitializing)
                 {
                     GUILayout.Label("In Chunk: " + entity.ChunkPos);
-                    GUILayout.Label("Entity Type: " + entity.entityProxy?.Name);
-                    GUILayout.Label("Entity Data: " + entity._entityData);
                 }
                 base.OnInspectorGUI();
             }

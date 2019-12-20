@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.GlobalEntity;
+using Island.Game.EntityBehaviour;
 using Island.Game.Proxy.Blocks;
 using Island.Game.Render;
 using Island.Game.World;
@@ -22,7 +22,7 @@ namespace Island.Game.System
     /// </summary>
     public class WorldManager : MonoBehaviour
     {
-        private const string DebugWorldName = "_DEBUG-WORLD_" + "191218.2";
+        private const string DebugWorldName = "_DEBUG-WORLD_" + "191220.1";
 
         /// <summary>
         /// 标记是否在初始化（第一次初始化所有Chunk状态）

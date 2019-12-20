@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Island.Game.Proxy.Entity
 {
-    public class EnvElement : IEntity
+    public class GameCamera : IEntity
     {
-        public string Name => "island.entity:env_element";
+        public string Name => "island.entity:game_camera";
 
         public Type GetEntityType()
         {
-            return typeof(EntityBehaviour.EnvElement);
+            return typeof(EntityBehaviour.GameCamera);
         }
 
         public void Init()

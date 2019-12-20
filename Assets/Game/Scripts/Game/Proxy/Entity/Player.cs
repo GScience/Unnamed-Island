@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Island.Game.Proxy.Entity
 {
-    public class EnvElement : IEntity
+    public class Player : IEntity
     {
-        public string Name => "island.entity:env_element";
+        public string Name => "island.entity:player";
 
         public Type GetEntityType()
         {
-            return typeof(EntityBehaviour.EnvElement);
+            return typeof(EntityBehaviour.Player);
         }
 
         public void Init()

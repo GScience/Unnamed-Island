@@ -1,4 +1,4 @@
-﻿using Island.Game.GlobalEntity;
+﻿using Island.Game.EntityBehaviour;
 using Island.Game.System;
 using System;
 using System.Collections;

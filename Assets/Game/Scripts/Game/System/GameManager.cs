@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.GlobalEntity;
+using Island.Game.EntityBehaviour;
 using Island.Game.World;
 using Island.UI;
 using UnityEngine;

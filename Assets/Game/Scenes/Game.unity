@@ -1163,6 +1163,7 @@ GameObject:
   - component: {fileID: 1383004600}
   - component: {fileID: 1383004602}
   - component: {fileID: 1383004603}
+  - component: {fileID: 1383004604}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -1230,6 +1231,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a5859ce0db51fac4fb984252183b801c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1383004604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383004599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f05be7205a2b25744b69449a058ee263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1542388278
@@ -1350,12 +1363,12 @@ MonoBehaviour:
 
     Update per second = 0
 
-    Memory = 704MB/1045MB
+    Memory = 457MB/888MB
 
     Free
-    Memory = 341MB
+    Memory = 430MB
 
-    Probably performance problem found = 1
+    Probably performance problem found = 23
 
     May has performance
     problem!'

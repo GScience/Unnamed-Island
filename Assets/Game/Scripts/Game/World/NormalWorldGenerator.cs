@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Island.Game.Proxy.Blocks;
-using Island.Game.GlobalEntity;
+using Island.Game.EntityBehaviour;
 using Island.Game.System;
 using UnityEngine;
 using Random = System.Random;
@@ -101,11 +101,26 @@ namespace Island.Game.World
                         "name", "Player"
                     },
                     {
+                        "type", "island.entity:player"
+                    },
+                    {
                         "position", new Vector3(16, 100, 16)
                     }
                 });
 
+            var cameraData = new DataTag(
+                new Dictionary<string, object>
+                {
+                    {
+                        "name", "Camera"
+                    },
+                    {
+                        "type", "island.entity:game_camera"
+                    }
+                });
+
             globalEntityList.Add(playerData);
+            globalEntityList.Add(cameraData);
         }
 
         public int GetHeight(int x, int z, float maxHeight, float scale = 1 / 200.0f)
