@@ -15,7 +15,7 @@ namespace Island.Game.Render
     /// <summary>
     /// 区块网格生成器
     /// </summary>
-    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(ChunkContainer))]
+    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(BlockContainer))]
     public class ChunkMeshGenerator : MonoBehaviour
     {
         public bool physicsReady;
@@ -27,7 +27,7 @@ namespace Island.Game.Render
         private readonly List<Vector2> _uvs = new List<Vector2>();
         private readonly List<int> _triangles = new List<int>();
 
-        private ChunkContainer _chunkContainer;
+        private BlockContainer _blockContainer;
         private MeshFilter _meshFilter;
         private Renderer _meshRenderer;
         private MeshCollider _meshCollider;
@@ -39,7 +39,7 @@ namespace Island.Game.Render
         {
             _meshRenderer = GetComponent<MeshRenderer>();
             _meshFilter = GetComponent<MeshFilter>();
-            _chunkContainer = GetComponent<ChunkContainer>();
+            _blockContainer = GetComponent<BlockContainer>();
 
             _mesh = new Mesh();
         }
@@ -76,9 +76,9 @@ namespace Island.Game.Render
 
         private Vector3 ScaleByBlockSize(Vector3 vector)
         {
-            vector.x *= _chunkContainer.BlockSize.x;
-            vector.y *= _chunkContainer.BlockSize.y;
-            vector.z *= _chunkContainer.BlockSize.z;
+            vector.x *= _blockContainer.BlockSize.x;
+            vector.y *= _blockContainer.BlockSize.y;
+            vector.z *= _blockContainer.BlockSize.z;
 
             return vector;
         }
@@ -95,28 +95,28 @@ namespace Island.Game.Render
             _uvs.Clear();
             _triangles.Clear();
 
-            for (var x = 0; x < _chunkContainer.ChunkSize.x; ++x)
+            for (var x = 0; x < _blockContainer.ContainerSize.x; ++x)
             {
-                for (var y = 0; y < _chunkContainer.ChunkSize.y; ++y)
-                    for (var z = 0; z < _chunkContainer.ChunkSize.z; ++z)
+                for (var y = 0; y < _blockContainer.ContainerSize.y; ++y)
+                    for (var z = 0; z < _blockContainer.ContainerSize.z; ++z)
                     {
 
-                        var blockData = _chunkContainer.GetBlockData(x, y, z);
+                        var blockData = _blockContainer.GetBlockData(x, y, z);
 
                         var needDraw = !blockData.IsAlpha && (
-                                           _chunkContainer.GetBlockData(x, y + 1, z).IsAlpha ||
-                                           _chunkContainer.GetBlockData(x, y - 1, z).IsAlpha ||
-                                           _chunkContainer.GetBlockData(x + 1, y, z).IsAlpha ||
-                                           _chunkContainer.GetBlockData(x - 1, y, z).IsAlpha ||
-                                           _chunkContainer.GetBlockData(x, y, z + 1).IsAlpha ||
-                                           _chunkContainer.GetBlockData(x, y, z - 1).IsAlpha);
+                                           _blockContainer.GetBlockData(x, y + 1, z).IsAlpha ||
+                                           _blockContainer.GetBlockData(x, y - 1, z).IsAlpha ||
+                                           _blockContainer.GetBlockData(x + 1, y, z).IsAlpha ||
+                                           _blockContainer.GetBlockData(x - 1, y, z).IsAlpha ||
+                                           _blockContainer.GetBlockData(x, y, z + 1).IsAlpha ||
+                                           _blockContainer.GetBlockData(x, y, z - 1).IsAlpha);
 
                         if (!needDraw)
                             continue;
 
                         var triangleStartPos = _vertices.Count;
 
-                        if (_chunkContainer.GetBlockData(x, y + 1, z).IsAlpha)
+                        if (_blockContainer.GetBlockData(x, y + 1, z).IsAlpha)
                         {
                             //上面
                             _vertices.Add(ScaleByBlockSize(new Vector3(x + 1, y, z)));
@@ -145,7 +145,7 @@ namespace Island.Game.Render
                             triangleStartPos += 4;
                         }
 
-                        if (_chunkContainer.GetBlockData(x, y - 1, z).IsAlpha)
+                        if (_blockContainer.GetBlockData(x, y - 1, z).IsAlpha)
                         {
                             //下面
 
@@ -176,7 +176,7 @@ namespace Island.Game.Render
                             triangleStartPos += 4;
                         }
 
-                        if (_chunkContainer.GetBlockData(x, y, z + 1).IsAlpha)
+                        if (_blockContainer.GetBlockData(x, y, z + 1).IsAlpha)
                         {
                             //前面
                             _vertices.Add(ScaleByBlockSize(new Vector3(x + 1, y - 1, z + 1)));
@@ -206,7 +206,7 @@ namespace Island.Game.Render
                             triangleStartPos += 4;
                         }
 
-                        if (_chunkContainer.GetBlockData(x, y, z - 1).IsAlpha)
+                        if (_blockContainer.GetBlockData(x, y, z - 1).IsAlpha)
                         {
                             //后面
                             _vertices.Add(ScaleByBlockSize(new Vector3(x + 1, y - 1, z)));
@@ -236,7 +236,7 @@ namespace Island.Game.Render
                             triangleStartPos += 4;
                         }
 
-                        if (_chunkContainer.GetBlockData(x - 1, y, z).IsAlpha)
+                        if (_blockContainer.GetBlockData(x - 1, y, z).IsAlpha)
                         {
                             //左面
                             _vertices.Add(ScaleByBlockSize(new Vector3(x, y - 1, z + 1)));
@@ -266,7 +266,7 @@ namespace Island.Game.Render
                             triangleStartPos += 4;
                         }
 
-                        if (_chunkContainer.GetBlockData(x + 1, y, z).IsAlpha)
+                        if (_blockContainer.GetBlockData(x + 1, y, z).IsAlpha)
                         {
                             //右面
                             _vertices.Add(ScaleByBlockSize(new Vector3(x + 1, y - 1, z + 1)));

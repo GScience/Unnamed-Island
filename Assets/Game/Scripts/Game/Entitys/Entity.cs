@@ -72,7 +72,7 @@ namespace Island.Game.Entitys
         /// </summary>
         /// <param name="chunkPos"></param>
         /// <returns></returns>
-        public ChunkContainer GetChunk()
+        public Chunk GetChunk()
         {
             return GameManager.WorldManager.GetChunk(ChunkPos);
         }
@@ -124,7 +124,7 @@ namespace Island.Game.Entitys
 
                 // 所在Chunk无效时不刷新实体
                 var chunk = GetChunk();
-                _canMove = chunk != null && chunk.IsPhysicsReady.GetValueOrDefault();
+                _canMove = chunk != null && chunk.IsPhysicsReady;
             }
 
             // 刷新实体移动
@@ -144,14 +144,14 @@ namespace Island.Game.Entitys
                 return;
 
             // 刷新实体所有权
-            if (ChunkPos != Owner.chunkPos)
+            if (ChunkPos != Owner.ChunkPos)
             {
                 var chunk = GameManager.WorldManager.GetChunk(ChunkPos);
                 if (chunk != null)
                 {
                     Owner.Remove(this);
                     Owner = null;
-                    chunk.EntityContainer.Add(this);
+                    chunk.AddEntity(this);
                 }
 
                 // 更改所有权
@@ -227,7 +227,7 @@ namespace Island.Game.Entitys
                 var entity = (Entity) serializedObject.targetObject;
 
                 if (!GameManager.IsInitializing)
-                    GUILayout.Label("In Chunk: " + entity.ChunkPos.x + entity.ChunkPos.z);
+                    GUILayout.Label("In Chunk: " + entity.ChunkPos);
                 base.OnInspectorGUI();
             }
         }

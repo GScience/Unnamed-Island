@@ -65,25 +65,25 @@ namespace Island.Game.System
         /// <summary>
         /// 区块图，记录使用的区块
         /// </summary>
-        private ChunkContainer[,] _chunkMap;
+        private Chunk[,] _chunkMap;
         /// <summary>
         /// 空闲区块列表
         /// </summary>
-        private List<ChunkContainer> _freeContainerList = new List<ChunkContainer>();
+        private List<Chunk> _freeContainerList = new List<Chunk>();
 
         /// <summary>
         /// 区块池
         /// </summary>
-        private readonly List<ChunkContainer> _chunkContainerPool = new List<ChunkContainer>();
+        private readonly List<Chunk> _chunkContainerPool = new List<Chunk>();
         /// <summary>
         /// 区块字典，用于查摘区块
         /// </summary>
-        private readonly ConcurrentDictionary<ChunkPos, ChunkContainer> _chunkDict = new ConcurrentDictionary<ChunkPos, ChunkContainer>();
+        private readonly ConcurrentDictionary<ChunkPos, Chunk> _chunkDict = new ConcurrentDictionary<ChunkPos, Chunk>();
 
         /// <summary>
         /// 是否有区块加载任务
         /// </summary>
-        private bool _hasLoadingTask;
+        private Task _chunkLoadingTask;
 
         /// <summary>
         /// 世界信息
@@ -129,16 +129,16 @@ namespace Island.Game.System
 
         private void Start()
         {
-            globalEntityContainer.AsyncLoadTask().Wait();
+            globalEntityContainer.AsyncLoadTask(ChunkPos.global).Wait();
         }
 
         private void OnDisable()
         {
             if (globalEntityContainer.IsLoaded)
-                globalEntityContainer.Unload();
+                globalEntityContainer.AsyncUnloadTask().Wait();
 
             foreach (var chunk in _chunkContainerPool)
-                chunk.Unload();
+                chunk.AsyncUnloadTask().Wait();
         }
 
         private void OnApplicationQuit()
@@ -157,7 +157,7 @@ namespace Island.Game.System
                 return;
 
             if (_chunkMap == null || _chunkMap.Length != (int) Mathf.Pow(sight * 2 + 1, 2))
-                _chunkMap = new ChunkContainer[sight * 2 + 1, sight * 2 + 1];
+                _chunkMap = new Chunk[sight * 2 + 1, sight * 2 + 1];
 
             var centerPos = worldAnchor.GetComponent<Entity>().ChunkPos;
 
@@ -172,14 +172,14 @@ namespace Island.Game.System
 
             foreach (var container in _chunkContainerPool)
             {
-                if (!container.chunkPos.IsAvailable())
+                if (!container.ChunkPos.IsAvailable())
                 {
                     _freeContainerList.Add(container);
                     continue;
                 }
 
-                var xDis = container.chunkPos.x - centerPos.x;
-                var zDis = container.chunkPos.z - centerPos.z;
+                var xDis = container.ChunkPos.x - centerPos.x;
+                var zDis = container.ChunkPos.z - centerPos.z;
 
                 if (Mathf.Abs(xDis) <= sight && Mathf.Abs(zDis) <= sight)
                 {
@@ -205,35 +205,35 @@ namespace Island.Game.System
                 return;
 
             // 正在加载chunk
-            if (_hasLoadingTask)
+            if (_chunkLoadingTask != null && !_chunkLoadingTask.IsCompleted)
                 return;
 
             // 排序
-            _freeContainerList.Sort((container1, container2) =>
+            _freeContainerList.Sort((chunk1, chunk2) =>
             {
                 var dis1 = 
-                    Mathf.Pow(container1.chunkPos.x - centerPos.x, 2) +
-                    Mathf.Pow(container1.chunkPos.z - centerPos.z, 2);
+                    Mathf.Pow(chunk1.ChunkPos.x - centerPos.x, 2) +
+                    Mathf.Pow(chunk1.ChunkPos.z - centerPos.z, 2);
 
                 var dis2 =
-                    Mathf.Pow(container2.chunkPos.x - centerPos.x, 2) +
-                    Mathf.Pow(container2.chunkPos.z - centerPos.z, 2);
+                    Mathf.Pow(chunk2.ChunkPos.x - centerPos.x, 2) +
+                    Mathf.Pow(chunk2.ChunkPos.z - centerPos.z, 2);
 
-                if (!container1.chunkPos.IsAvailable() && container1.chunkPos.IsAvailable())
+                if (!chunk1.ChunkPos.IsAvailable() && chunk1.ChunkPos.IsAvailable())
                     return -1;
-                if (container1.chunkPos.IsAvailable() && !container1.chunkPos.IsAvailable())
+                if (chunk1.ChunkPos.IsAvailable() && !chunk1.ChunkPos.IsAvailable())
                     return 1;
                 if (dis1 > dis2)
                     return -1;
                 if (dis1 < dis2)
                     return 1;
-                if (container1.chunkPos.x > container2.chunkPos.x)
+                if (chunk1.ChunkPos.x > chunk2.ChunkPos.x)
                     return -1;
-                if (container1.chunkPos.x < container2.chunkPos.x)
+                if (chunk1.ChunkPos.x < chunk2.ChunkPos.x)
                     return 1;
-                if (container1.chunkPos.z > container2.chunkPos.z)
+                if (chunk1.ChunkPos.z > chunk2.ChunkPos.z)
                     return -1;
-                if (container1.chunkPos.z < container2.chunkPos.z)
+                if (chunk1.ChunkPos.z < chunk2.ChunkPos.z)
                     return 1;
                 return 0;
             });
@@ -274,18 +274,15 @@ namespace Island.Game.System
                         EnlargePool(1, ref _freeContainerList);
 
                     var freeContainer = _freeContainerList[0];
-                    _chunkDict.TryRemove(freeContainer.chunkPos, out var _);
+                    _chunkDict.TryRemove(freeContainer.ChunkPos, out var _);
                     _freeContainerList.RemoveAt(0);
 
                     var chunkPos = new ChunkPos(centerPos.x + x - sight, centerPos.z + z - sight);
 
-                    _hasLoadingTask = true;
-                    freeContainer.LoadAsync(chunkPos.x, chunkPos.z, () =>
-                    {
-                        _chunkDict[chunkPos] = freeContainer;
-                        _hasLoadingTask = false;
-                    });
+                    _chunkLoadingTask = freeContainer.AsyncLoadTask(chunkPos);
+
                     _chunkMap[x, z] = freeContainer;
+                    _chunkDict[chunkPos] = freeContainer;
 
                     // 非初始化时一次只加载一个Chunk
                     /*if (!IsInitializing)*/
@@ -296,29 +293,27 @@ namespace Island.Game.System
 
         void EnlargePool(int size)
         {
-            var list = new List<ChunkContainer>();
+            var list = new List<Chunk>();
             EnlargePool(size, ref list);
         }
 
-        void EnlargePool(int size, ref List<ChunkContainer> containerList)
+        void EnlargePool(int size, ref List<Chunk> containerList)
         {
             for (var i = 0; i < size; ++i)
             {
                 var chunkObj = new GameObject();
-                var container = chunkObj.AddComponent<ChunkContainer>();
-                chunkObj.AddComponent<ChunkMeshGenerator>();
-                chunkObj.AddComponent<MeshCollider>();
+                var chunk = chunkObj.AddComponent<Chunk>();
 
                 chunkObj.transform.parent = chunkParent;
-                container.enabled = false;
-                container.SetSize(ChunkSize, BlockSize);
+                chunk.enabled = false;
+                chunk.SetSize(ChunkSize, BlockSize);
 
-                _chunkContainerPool.Add(container);
-                containerList.Add(container);
+                _chunkContainerPool.Add(chunk);
+                containerList.Add(chunk);
             }
         }
 
-        public ChunkContainer GetChunk(ChunkPos chunkPos)
+        public Chunk GetChunk(ChunkPos chunkPos)
         {
             return !_chunkDict.TryGetValue(chunkPos, out var chunk) ? null : chunk;
         }

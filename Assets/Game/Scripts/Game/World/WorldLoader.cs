@@ -68,7 +68,10 @@ namespace Island.Game.World
         /// <param name="entitys"></param>
         public void SaveEntity(ChunkPos chunkPos, List<EntityData> entityDataList)
         {
-            if (chunkPos.IsAvailable())
+            if (!chunkPos.IsAvailable())
+                return;
+
+            if (!chunkPos.IsGlobal())
                 SaveEntity(chunkPos.x + "." + chunkPos.z, entityDataList);
             else
                 SaveEntity("global", entityDataList);
@@ -80,15 +83,18 @@ namespace Island.Game.World
         /// <param name="entitys"></param>
         public void LoadEntity(ChunkPos chunkPos, ref List<EntityData> entityDataList)
         {
-            var entityDataName = chunkPos.IsAvailable() ? chunkPos.x + "." + chunkPos.z : "global";
+            var entityDataName = chunkPos.IsGlobal() ? "global" : chunkPos.x + "." + chunkPos.z;
 
             var loadPath = _dir + "e." + entityDataName + ".dat";
+
+            if (!chunkPos.IsAvailable())
+                return;
 
             // 如果未创建实体信息则生成
             if (!File.Exists(loadPath))
             {
                 var worldSize = GameManager.WorldManager.worldInfo.worldSize;
-                if (chunkPos.IsAvailable())
+                if (!chunkPos.IsGlobal())
                 {
                     if (
                         !(chunkPos.x < 0 || chunkPos.x > worldSize.x || 
@@ -117,13 +123,16 @@ namespace Island.Game.World
             entityStream.Close();
         }
 
-        public void SaveChunkBlock(ChunkPos chunkPos, Block[,,] blocks)
+        public void SaveBlock(ChunkPos chunkPos, Block[,,] blocks)
         {
             if (_dir == "")
             {
                 Debug.LogError("Not load world");
                 return;
             }
+
+            if (!chunkPos.IsAvailable())
+                return;
 
             var chunkSize = GameManager.WorldManager.ChunkSize;
 
@@ -167,13 +176,16 @@ namespace Island.Game.World
             File.Delete(saveTmpPath);
         }
 
-        public void LoadChunkBlock(ChunkPos chunkPos, ref Block[,,] blocks)
+        public void LoadBlock(ChunkPos chunkPos, ref Block[,,] blocks)
         {
             if (_dir == "")
             {
                 Debug.LogError("Not load world");
                 return;
             }
+
+            if (!chunkPos.IsAvailable())
+                return;
 
             var chunkFilePath = _dir + "c." + chunkPos.x + "." + chunkPos.z + ".dat";
             var chunkTmpFilePath = chunkFilePath + ".tmp";

@@ -13,10 +13,10 @@ namespace Island.Game.Entitys
     /// <summary>
     /// 环境元素实体
     /// </summary>
-    [RequireComponent(typeof(SpriteRenderer), typeof(Billboard))]
     public class EnvElement : Entity
     {
-        private SpriteRenderer _spriteRenderer;
+        private SpriteRenderer _spriteRenderer1;
+        private SpriteRenderer _spriteRenderer2;
 
         public IEnvElement envElement;
 
@@ -25,9 +25,15 @@ namespace Island.Game.Entitys
             set
             {
                 if (value)
-                    _spriteRenderer.color = new Color(0.7f, 0.7f, 0.7f, 1);
+                {
+                    _spriteRenderer1.color = new Color(0.7f, 0.7f, 0.7f, 1);
+                    _spriteRenderer2.color = new Color(0.7f, 0.7f, 0.7f, 1);
+                }
                 else
-                    _spriteRenderer.color = Color.white;
+                {
+                    _spriteRenderer1.color = Color.white;
+                    _spriteRenderer2.color = Color.white;
+                }
             }
         }
 
@@ -45,7 +51,8 @@ namespace Island.Game.Entitys
             base.LoadFromEntityData();
             var envElementName = _entityData.Get<string>("envElement");
             envElement = GameManager.DataManager.Get<IEnvElement>(envElementName);
-            _spriteRenderer.sprite = envElement?.GetEnvElementSprite();
+            _spriteRenderer1.sprite = envElement?.GetEnvElementSprite(); 
+            _spriteRenderer2.sprite = envElement?.GetEnvElementSprite();
             SetCollider(
                 envElement?.GetColliderCenter() ?? Vector3.zero, 
                 envElement?.GetColliderSize() ?? 0);
@@ -55,12 +62,18 @@ namespace Island.Game.Entitys
 
         private void Awake()
         {
-            var spriteObject = new GameObject("sprite");
-            spriteObject.transform.parent = transform;
-            spriteObject.transform.localPosition = Vector3.zero;
-            spriteObject.transform.localRotation = Quaternion.identity;
-            _spriteRenderer = spriteObject.AddComponent<SpriteRenderer>();
-            spriteObject.AddComponent<Billboard>();
+            var sprite1Object = new GameObject("sprite1");
+            var sprite2Object = new GameObject("sprite2");
+            sprite1Object.transform.parent = transform;
+            sprite1Object.transform.localPosition = Vector3.zero;
+            sprite1Object.transform.localRotation = Quaternion.AngleAxis(-45, Vector3.up);
+            sprite2Object.transform.parent = transform;
+            sprite2Object.transform.localPosition = Vector3.zero;
+            sprite2Object.transform.localRotation = Quaternion.AngleAxis(45, Vector3.up);
+            _spriteRenderer1 = sprite1Object.AddComponent<SpriteRenderer>();
+            _spriteRenderer2 = sprite2Object.AddComponent<SpriteRenderer>();
+
+            //spriteObject.AddComponent<Billboard>();
         }
     }
 }

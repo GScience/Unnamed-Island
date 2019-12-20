@@ -18,12 +18,7 @@ namespace Island.Game.World
     /// </summary>
     public class EntityContainer : MonoBehaviour
     {
-        private ChunkContainer chunkContainer;
-
         public bool IsLoaded { get; private set; }
-
-        public bool IsGlobalContainer => chunkContainer == null;
-        public ChunkPos chunkPos => chunkContainer?.chunkPos ?? ChunkPos.nonAvailable;
 
         private List<Entity> _entityList = new List<Entity>();
         private List<EntityData> _entityDataList = new List<EntityData>();
@@ -36,47 +31,33 @@ namespace Island.Game.World
         private Task _loadTask;
         private CancellationTokenSource _cts;
 
+        public ChunkPos ChunkPos { get; private set; } = ChunkPos.nonAvailable;
+
+        public bool IsGlobalContainer => ChunkPos.IsGlobal();
+
+        private bool _hasLoadingCoroutine = false;
+
         private void Awake()
         {
-            chunkContainer = GetComponentInParent<ChunkContainer>();
-
-            // 加载全局实体容器中的默认实体
-            if (IsGlobalContainer)
+            // 加载实体容器中的默认实体
+            foreach (var entity in GetComponentsInChildren<Entity>())
             {
-                foreach (var entity in GetComponentsInChildren<Entity>())
-                {
 #if UNITY_EDITOR
-                    foreach (var findEntity in _entityList)
-                        if (findEntity.gameObject.name == entity.gameObject.name)
-                            Debug.LogError("There is two entity in global container with the same name");
+                foreach (var findEntity in _entityList)
+                    if (findEntity.gameObject.name == entity.gameObject.name)
+                        Debug.LogError("There is two entity in global container with the same name");
 #endif
-                    Add(entity);
-                }
+                Add(entity);
             }
         }
 
-        public void Load()
+        public Task AsyncLoadTask(ChunkPos chunkPos)
         {
-            var pos = chunkPos;
-
             if (_unloadTask == null || _unloadTask.IsCompleted)
                 _unloadTask = AsyncUnloadTask();
 
-            if (_loadTask != null && !_loadTask.IsCompleted)
-                _cts.Cancel();
-
-            _unloadTask?.Wait();
-            _loadTask?.Wait();
-            GameManager.WorldManager.worldLoader.LoadEntity(pos, ref _entityDataList);
-            _isDirty = true;
-        }
-
-        public Task AsyncLoadTask()
-        {
-            var pos = chunkPos;
-
-            if (_unloadTask == null || _unloadTask.IsCompleted)
-                _unloadTask = AsyncUnloadTask();
+            var oldChunkPos = ChunkPos;
+            ChunkPos = chunkPos;
 
             if (_loadTask != null && !_loadTask.IsCompleted)
                 _cts.Cancel();
@@ -86,20 +67,12 @@ namespace Island.Game.World
             var loadTask = new Task(() =>
             {
                 _unloadTask.Wait();
-                GameManager.WorldManager.worldLoader.LoadEntity(pos, ref _entityDataList);
+                GameManager.WorldManager.worldLoader.LoadEntity(chunkPos, ref _entityDataList);
                 _isDirty = true;
             }, _cts.Token);
             loadTask.Start();
             _loadTask = loadTask;
             return loadTask;
-        }
-
-        public void Unload()
-        {
-            if (_unloadTask != null && !_unloadTask.IsCompleted)
-                _unloadTask.Wait();
-            else
-                AsyncUnloadTask().Wait();
         }
 
         public Task AsyncUnloadTask()
@@ -108,6 +81,7 @@ namespace Island.Game.World
                 return _unloadTask;
 
             var needSave = IsLoaded;
+            var oldChunkPos = ChunkPos;
 
             IsLoaded = false;
             _isDirty = false;
@@ -115,7 +89,7 @@ namespace Island.Game.World
             foreach (var entity in _entityList)
                 _entityDataList.Add(entity.GetEntityData());
 
-            if (!IsGlobalContainer)
+            if (!IsGlobalContainer && ChunkPos.IsAvailable())
             {
                 foreach (var entity in _entityList)
                     Destroy(entity.gameObject);
@@ -124,19 +98,18 @@ namespace Island.Game.World
             }
 
             StopAllCoroutines();
-            _entityUpdationCotourine = 0;
+            if (_hasLoadingCoroutine)
+                --_entityUpdationCotourine;
 
-            var pos = chunkPos;
-
-            var saveTask = new Task(() =>
+            _unloadTask = new Task(() =>
             {
                 if (needSave)
-                    GameManager.WorldManager.worldLoader.SaveEntity(pos, _entityDataList);
+                    GameManager.WorldManager.worldLoader.SaveEntity(oldChunkPos, _entityDataList);
                 _entityDataList.Clear();
             });
-            saveTask.Start();
-            _unloadTask = saveTask;
-            return saveTask;
+            _unloadTask.Start();
+
+            return _unloadTask;
         }
 
         public List<Entity> GetEntityList()
@@ -179,6 +152,7 @@ namespace Island.Game.World
         {
             _isDirty = false;
             ++_entityUpdationCotourine;
+            _hasLoadingCoroutine = true;
 
             var entityAddCountInFrame = 0;
 
@@ -201,7 +175,7 @@ namespace Island.Game.World
                     var entity = Create(entityType);
                     entity.SetEntityData(entityData);
 
-                    if (++entityAddCountInFrame > 3)
+                    if (++entityAddCountInFrame > 1)
                     {
                         entityAddCountInFrame = 0;
                         yield return 1;
@@ -211,6 +185,7 @@ namespace Island.Game.World
 
             _entityDataList.Clear();
             --_entityUpdationCotourine;
+            _hasLoadingCoroutine = false;
 
             IsLoaded = true;
         }
@@ -222,6 +197,18 @@ namespace Island.Game.World
                 if (_entityUpdationCotourine < 1)
                     StartCoroutine(DirtyContainerUpdateCorutine());
             }
+        }
+
+        void OnDisable()
+        {
+            foreach (var entity in _entityList)
+                entity.gameObject.SetActive(false);
+        }
+
+        void OnEnable()
+        {
+            foreach (var entity in _entityList)
+                entity.gameObject.SetActive(true);
         }
 
 #if UNITY_EDITOR

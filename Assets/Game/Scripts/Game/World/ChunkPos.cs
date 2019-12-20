@@ -25,7 +25,13 @@ namespace Island.Game.World
             return x != int.MaxValue;
         }
 
+        public bool IsGlobal()
+        {
+            return x == int.MinValue;
+        }
+
         public static ChunkPos nonAvailable = new ChunkPos(int.MaxValue, int.MaxValue);
+        public static ChunkPos global = new ChunkPos(int.MinValue, int.MinValue);
 
         public override bool Equals(object obj)
         {
@@ -45,6 +51,11 @@ namespace Island.Game.World
         public static bool operator !=(ChunkPos chunkPos1, ChunkPos chunkPos2)
         {
             return !(chunkPos1 == chunkPos2);
+        }
+
+        public override string ToString()
+        {
+            return $"({x},{z})";
         }
     }
 }
