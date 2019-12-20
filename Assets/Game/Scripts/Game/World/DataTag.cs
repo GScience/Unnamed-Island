@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.Game.Entitys
+namespace Island.Game.World
 {
     /// <summary>
     /// 实体数据类型
     /// </summary>
-    public class EntityData
+    public class DataTag
     {
         #region DataLoader
         /// <summary>
@@ -47,7 +47,7 @@ namespace Island.Game.Entitys
         /// <summary>
         /// 初始化数据加载器
         /// </summary>
-        static EntityData()
+        static DataTag()
         {
             // Vector3
             _dataLoader[typeof(Vector3)] = new DataLoader(
@@ -183,22 +183,16 @@ namespace Island.Game.Entitys
             }
         }
 
-        public EntityData(string name, Type type, Dictionary<string, object> args = null)
+        public DataTag(Dictionary<string, object> args = null)
         {
-            Set("name", name);
-            Set("type", type.FullName);
-
             if (args != null)
                 foreach (var pair in args)
                     Set(pair.Key, pair.Value);
         }
 
-        public string EntityName => Get<string>("name");
-        public string EntityType => Get<string>("type");
-
-        public static EntityData Empty()
+        public static DataTag Empty()
         {
-            return new EntityData("", typeof(Entity));
+            return new DataTag();
         }
         #endregion
     }

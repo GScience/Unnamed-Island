@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.Game.Data.EnvElements
+namespace Island.Game.Proxy.EnvElements
 {
     /// <summary>
     /// 环境元素数据基类
@@ -25,7 +25,7 @@ namespace Island.Game.Data.EnvElements
 
         protected abstract string GetSpriteName();
 
-        public void Load()
+        public void Init()
         {
             _sprite = GameManager.EnvElementSpriteDatabase.Get(GetSpriteName());
         }

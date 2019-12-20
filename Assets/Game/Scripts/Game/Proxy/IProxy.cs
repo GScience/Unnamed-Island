@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Island.Game.Data
+namespace Island.Game.Proxy
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IData
+    public interface IProxy
     {
         string Name { get; }
 
-        void Load();
+        void Init();
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Island.Game.Data.Blocks;
+using Island.Game.Proxy.Blocks;
 using Island.Game.System;
 using Island.Game.World;
 using UnityEngine;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Island.Game.Render;
 using Island.Game.System;
 
-namespace Island.Game.Data.Blocks
+namespace Island.Game.Proxy.Blocks
 {
     class Grass : IBlock
     {
@@ -15,7 +15,7 @@ namespace Island.Game.Data.Blocks
         private BlockTexture _dirtTop = BlockTexture.empty;
 
         public string Name => "island.block:grass";
-        public void Load()
+        public void Init()
         {
             _grassTop = GameManager.BlockTextureManager.Get("grassTop");
             _grassAround = GameManager.BlockTextureManager.Get("grassAround");

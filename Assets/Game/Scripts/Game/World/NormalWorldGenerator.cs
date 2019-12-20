@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.Data.Blocks;
-using Island.Game.Entitys;
+using Island.Game.Proxy.Blocks;
+using Island.Game.GlobalEntity;
 using Island.Game.System;
 using UnityEngine;
 using Random = System.Random;
@@ -24,9 +24,9 @@ namespace Island.Game.World
 
         protected override void Init()
         {
-            air = GameManager.DataManager.Get<IBlock>("island.block:air");
-            dirt = GameManager.DataManager.Get<IBlock>("island.block:dirt");
-            grass = GameManager.DataManager.Get<IBlock>("island.block:grass");
+            air = GameManager.ProxyManager.Get<IBlock>("island.block:air");
+            dirt = GameManager.ProxyManager.Get<IBlock>("island.block:dirt");
+            grass = GameManager.ProxyManager.Get<IBlock>("island.block:grass");
         }
 
         public override void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks)
@@ -43,15 +43,15 @@ namespace Island.Game.World
                     for (var y = 0; y < worldInfo.chunkSize.y; ++y)
                     {
                         if (y > height)
-                            blocks[x, y, z].blockData = air;
+                            blocks[x, y, z].blockProxy = air;
                         else if (y == height)
-                            blocks[x, y, z].blockData = grass;
+                            blocks[x, y, z].blockProxy = grass;
                         else
-                            blocks[x, y, z].blockData = dirt;
+                            blocks[x, y, z].blockProxy = dirt;
                     }
                 }
         }
-        public override void GenChunkEntity(ChunkPos chunkPos, ref List<EntityData> entityData)
+        public override void GenChunkEntity(ChunkPos chunkPos, ref List<DataTag> entityData)
         {
             var count = _random.Next() % 50 + 1;
 
@@ -70,17 +70,21 @@ namespace Island.Game.World
                     height * worldInfo.blockSize.y,
                     chunkPos.z * worldInfo.chunkSize.z + (z + 0.5f) * worldInfo.blockSize.z);
 
-                var envElement = new EntityData(
-                    "EnvElement",
-                    typeof(EnvElement),
+                var envElement = new DataTag(
                     new Dictionary<string, object>
                     {
-                            {
-                                "position", pos
-                            },
-                            {
-                                "envElement", "island.env_element:withered_grass"
-                            }
+                        {
+                            "name", "EnvElement"
+                        },
+                        {
+                            "type", "island.entity:env_element"
+                        },
+                        {
+                            "position", pos
+                        },
+                        {
+                            "envElement", "island.env_element:withered_grass"
+                        }
                     }
                     );
 
@@ -88,10 +92,18 @@ namespace Island.Game.World
             }
         }
 
-        public override void GenGlobalEntity(ref List<EntityData> globalEntityList)
+        public override void GenGlobalEntity(ref List<DataTag> globalEntityList)
         {
-            var playerData = new EntityData("Player", typeof(Player));
-            playerData.Set("position", new Vector3(16, 100, 16));
+            var playerData = new DataTag(
+                new Dictionary<string, object>
+                {
+                    {
+                        "name", "Player"
+                    },
+                    {
+                        "position", new Vector3(16, 100, 16)
+                    }
+                });
 
             globalEntityList.Add(playerData);
         }

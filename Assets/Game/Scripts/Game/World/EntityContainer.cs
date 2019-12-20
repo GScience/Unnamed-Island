@@ -1,4 +1,4 @@
-﻿using Island.Game.Entitys;
+﻿using Island.Game.GlobalEntity;
 using Island.Game.System;
 using System;
 using System.Collections;
@@ -21,7 +21,7 @@ namespace Island.Game.World
         public bool IsLoaded { get; private set; }
 
         private List<Entity> _entityList = new List<Entity>();
-        private List<EntityData> _entityDataList = new List<EntityData>();
+        private List<DataTag> _entityDataList = new List<DataTag>();
 
         private bool _isDirty;
 
@@ -87,7 +87,7 @@ namespace Island.Game.World
             _isDirty = false;
 
             foreach (var entity in _entityList)
-                _entityDataList.Add(entity.GetEntityData());
+                _entityDataList.Add(entity.GetEntityDataTag());
 
             if (!IsGlobalContainer && ChunkPos.IsAvailable())
             {
@@ -117,14 +117,9 @@ namespace Island.Game.World
             return _entityList;
         }
 
-        public Entity Create(Type type, string entityName = null)
+        public Entity Create(string entityName = null)
         {
-            return Entity.Create(this, type, entityName);
-        }
-
-        public Entity Create<T>() where T: Entity
-        {
-            return Entity.Create<T>(this);
+            return Entity.Create(this, entityName);
         }
 
         public void Add(Entity entity)
@@ -161,7 +156,7 @@ namespace Island.Game.World
                 // 全局容器直接同步数据
                 foreach (var entityData in _entityDataList)
                 {
-                    var entity = _entityList.Find((Entity e) => e.gameObject.name == entityData.EntityName);
+                    var entity = _entityList.Find((Entity e) => e.gameObject.name == entityData.Get<string>("name"));
                     entity.SetEntityData(entityData);
                 }
             }
@@ -170,9 +165,7 @@ namespace Island.Game.World
                 // 非全局容器直接创建对象
                 foreach (var entityData in _entityDataList)
                 {
-                    var entityTypeName = entityData.EntityType;
-                    var entityType = Type.GetType(entityTypeName);
-                    var entity = Create(entityType);
+                    var entity = Create(entityData.Get<string>("name"));
                     entity.SetEntityData(entityData);
 
                     if (++entityAddCountInFrame > 1)

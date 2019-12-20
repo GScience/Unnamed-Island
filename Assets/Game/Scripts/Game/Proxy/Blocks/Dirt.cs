@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Island.Game.Data.Blocks
+namespace Island.Game.Proxy.Blocks
 {
     class Dirt : IBlock
     {
@@ -14,7 +14,7 @@ namespace Island.Game.Data.Blocks
         private BlockTexture _dirtTop = BlockTexture.empty;
 
         public string Name => "island.block:dirt";
-        public void Load()
+        public void Init()
         {
             _dirtAround = GameManager.BlockTextureManager.Get("dirtAround");
             _dirtTop = GameManager.BlockTextureManager.Get("dirtTop");

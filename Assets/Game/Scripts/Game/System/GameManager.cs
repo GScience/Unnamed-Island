@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.Entitys;
+using Island.Game.GlobalEntity;
 using Island.Game.World;
 using Island.UI;
 using UnityEngine;
@@ -14,10 +14,10 @@ namespace Island.Game.System
     /// 游戏管理器
     /// 负责管理所有控制器
     /// </summary>
-    [RequireComponent(typeof(DataManager), typeof(WorldManager), typeof(BlockTextureManager))]
+    [RequireComponent(typeof(ProxyManager), typeof(WorldManager), typeof(BlockTextureManager))]
     class GameManager : MonoBehaviour
     {
-        public static DataManager DataManager { get; private set; }
+        public static ProxyManager ProxyManager { get; private set; }
         public static WorldManager WorldManager { get; private set; }
         public static BlockTextureManager BlockTextureManager { get; private set; }
         public static SpriteDatabase EnvElementSpriteDatabase { get; private set; }
@@ -36,7 +36,7 @@ namespace Island.Game.System
             PlayerController = playerController;
             EnvElementSpriteDatabase = envElementSpriteDatabase;
 
-            DataManager = GetComponent<DataManager>();
+            ProxyManager = GetComponent<ProxyManager>();
             WorldManager = GetComponent<WorldManager>();
             BlockTextureManager = GetComponent<BlockTextureManager>();
         }

@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.Game.Data.EnvElements
+namespace Island.Game.Proxy.EnvElements
 {
     /// <summary>
     /// 环境元素数据接口
     /// </summary>
-    public interface IEnvElement : IData
+    public interface IEnvElement : IProxy
     {
         Sprite GetEnvElementSprite();
         float GetColliderSize();

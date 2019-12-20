@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.Game.Data.EnvElements
+namespace Island.Game.Proxy.EnvElements
 {
     public class WitheredGrass : EnvElementBase
     {

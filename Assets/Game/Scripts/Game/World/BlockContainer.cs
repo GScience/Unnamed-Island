@@ -1,4 +1,4 @@
-﻿using Island.Game.Data.Blocks;
+﻿using Island.Game.Proxy.Blocks;
 using Island.Game.Render;
 using Island.Game.System;
 using System;
@@ -34,7 +34,7 @@ namespace Island.Game.World
 
         public void Start()
         {
-            _air = GameManager.DataManager.Get<IBlock>("island.block:air");
+            _air = GameManager.ProxyManager.Get<IBlock>("island.block:air");
         }
 
         public void SetSize(Vector3Int containerSize, Vector3 blockSize)
@@ -50,14 +50,14 @@ namespace Island.Game.World
                 return _air;
 
             var block = _blocks[x, y, z];
-            if (block.blockData == null)
+            if (block.blockProxy == null)
                 return _air;
-            return block.blockData;
+            return block.blockProxy;
         }
         public void SetBlock(int x, int y, int z, string blockName)
         {
-            var data = GameManager.DataManager.Get<IBlock>(blockName);
-            _blocks[x, y, z].blockData = data;
+            var data = GameManager.ProxyManager.Get<IBlock>(blockName);
+            _blocks[x, y, z].blockProxy = data;
         }
 
         void LateUpdate()
@@ -123,7 +123,7 @@ namespace Island.Game.World
                 for (var x = 0; x < ContainerSize.x; ++x)
                     for (var y = 0; y < ContainerSize.y; ++y)
                         for (var z = 0; z < ContainerSize.z; ++z)
-                            _blocks[x, y, z].blockData = null;
+                            _blocks[x, y, z].blockProxy = null;
             });
             _unloadTask.Start();
 

@@ -1,10 +1,11 @@
 
-using Island.Game.Entitys;
+using Island.Game.GlobalEntity;
+using Island.Game.World;
 using Spine.Unity;
 using System;
 using UnityEngine;
 
-namespace Island.Game.Entitys
+namespace Island.Game.GlobalEntity
 {
     /// <summary>
     /// 玩家实体
@@ -125,7 +126,7 @@ namespace Island.Game.Entitys
         {
             var overlapResult = Physics.OverlapSphere(
                 transform.position,
-                interactSize, 1 << Layer);
+                interactSize, 1 << 8);
 
             // 没有选择任何物体
             if (overlapResult.Length <= 1)

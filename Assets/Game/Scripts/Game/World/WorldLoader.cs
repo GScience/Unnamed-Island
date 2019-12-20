@@ -1,4 +1,4 @@
-﻿using Island.Game.Entitys;
+﻿using Island.Game.GlobalEntity;
 using Island.Game.System;
 using System;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace Island.Game.World
         /// 保存全局实体
         /// </summary>
         /// <param name="entitys"></param>
-        private void SaveEntity(string filePath, List<EntityData> entityDataList)
+        private void SaveEntity(string filePath, List<DataTag> entityDataList)
         {
             var savePath = _dir + "e." + filePath + ".dat";
             var saveTmpPath = savePath + ".tmp";
@@ -66,7 +66,7 @@ namespace Island.Game.World
         /// 保存实体
         /// </summary>
         /// <param name="entitys"></param>
-        public void SaveEntity(ChunkPos chunkPos, List<EntityData> entityDataList)
+        public void SaveEntity(ChunkPos chunkPos, List<DataTag> entityDataList)
         {
             if (!chunkPos.IsAvailable())
                 return;
@@ -81,7 +81,7 @@ namespace Island.Game.World
         /// 加载实体
         /// </summary>
         /// <param name="entitys"></param>
-        public void LoadEntity(ChunkPos chunkPos, ref List<EntityData> entityDataList)
+        public void LoadEntity(ChunkPos chunkPos, ref List<DataTag> entityDataList)
         {
             var entityDataName = chunkPos.IsGlobal() ? "global" : chunkPos.x + "." + chunkPos.z;
 
@@ -114,8 +114,9 @@ namespace Island.Game.World
 
             for (var i = 0; i < entityCount; ++i)
             {
-                var entityData = EntityData.Empty();
+                var entityData = DataTag.Empty();
                 entityData.Load(reader);
+
                 entityDataList.Add(entityData);
             }
 
@@ -148,7 +149,7 @@ namespace Island.Game.World
                 for (var y = 0; y < chunkSize.y; ++y)
                     for (var z = 0; z < chunkSize.z; ++z)
                     {
-                        var blockData = blocks[x, y, z].blockData;
+                        var blockData = blocks[x, y, z].blockProxy;
                         var blockName = blockData == null ? "island.block:air" : blockData.Name;
                         if (!blockIndex.Contains(blockName))
                             blockIndex.Add(blockName);

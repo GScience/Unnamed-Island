@@ -1,4 +1,4 @@
-﻿using Island.Game.Entitys;
+﻿using Island.Game.GlobalEntity;
 using Island.Game.System;
 using System;
 using System.Collections;
@@ -20,8 +20,8 @@ namespace Island.Game.World
     public abstract class WorldGenerator : MonoBehaviour
     {
         public abstract void GenChunk(ChunkPos chunkPos, ref Block[,,] blocks);
-        public abstract void GenChunkEntity(ChunkPos chunkPos, ref List<EntityData> entityData);
-        public abstract void GenGlobalEntity(ref List<EntityData> entityData);
+        public abstract void GenChunkEntity(ChunkPos chunkPos, ref List<DataTag> entityData);
+        public abstract void GenGlobalEntity(ref List<DataTag> entityData);
 
         protected abstract void Init();
 

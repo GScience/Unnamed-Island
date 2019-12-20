@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Island.Game.Proxy.Entity;
 using Island.Game.System;
 using Island.Game.World;
 using UnityEditor;
 using UnityEngine;
 
-namespace Island.Game.Entitys
+namespace Island.Game.World
 {
     /// <summary>
     /// 实体抽象类
     /// 所有实体需要继承此类
     /// </summary>
-    public abstract class Entity : MonoBehaviour
+    public class Entity : MonoBehaviour
     {
         /// <summary>
         /// 所有Entity所在层
@@ -49,6 +51,11 @@ namespace Island.Game.Entitys
         private SphereCollider _collider;
 
         /// <summary>
+        /// 实体代理
+        /// </summary>
+        public IEntity entityProxy;
+
+        /// <summary>
         /// 是否有刷新事件
         /// </summary>
         protected bool HasUpdation
@@ -58,9 +65,14 @@ namespace Island.Game.Entitys
         }
 
         /// <summary>
-        /// 实体数据
+        /// 实体数据，用于序列化和反序列化
         /// </summary>
-        protected EntityData _entityData;
+        protected DataTag _entityDataTag = DataTag.Empty();
+
+        /// <summary>
+        /// 实体数据，用于代理
+        /// </summary>
+        protected dynamic _entityData = new ExpandoObject();
 
         /// <summary>
         /// 是否可以移动
@@ -77,30 +89,45 @@ namespace Island.Game.Entitys
             return GameManager.WorldManager.GetChunk(ChunkPos);
         }
 
+        public dynamic GetEntityData()
+        {
+            return _entityData;
+        }
+
         /// <summary>
         /// 设置实体数据
         /// </summary>
         /// <param name="entityData"></param>
-        public void SetEntityData(EntityData entityData)
+        public void SetEntityData(DataTag entityData)
         {
-            if (entityData.EntityType != GetType().FullName)
-                Debug.LogError("Wrong entity data set to entity");
-            _entityData = entityData;
+            // 设置代理
+            var entityType = entityData.Get<string>("type");
 
+            if (!string.IsNullOrEmpty(entityType))
+            {
+                entityProxy = GameManager.ProxyManager.Get<IEntity>(entityType);
+                HasUpdation = entityProxy.HasUpdation;
+            }
+
+            // 同步标签
+            _entityDataTag = entityData;
+
+            // 加载
             LoadFromEntityData();
+            entityProxy?.Load(this, entityData);
         }
 
         /// <summary>
         /// 获取实体数据
         /// </summary>
         /// <returns></returns>
-        public EntityData GetEntityData()
+        public DataTag GetEntityDataTag()
         {
             if (_entityData == null)
-                _entityData = EntityData.Empty();
-            SaveToEntityData();
+                _entityData = DataTag.Empty();
+            SaveToEntityDataTag();
 
-            return _entityData;
+            return _entityDataTag;
         }
 
         void Start()
@@ -128,8 +155,11 @@ namespace Island.Game.Entitys
             }
 
             // 刷新实体移动
-            if (_canMove)
+            if (_canMove && HasUpdation)
+            {
+                entityProxy?.Update(this);
                 UpdateEntityState();
+            }
         }
 
         /// <summary>
@@ -159,20 +189,20 @@ namespace Island.Game.Entitys
             }
         }
 
-        protected abstract void UpdateEntityState();
-
-        protected virtual void SaveToEntityData()
+        protected virtual void SaveToEntityDataTag()
         {
-            _entityData.Set("type", GetType().FullName);
-            _entityData.Set("name", gameObject.name);
-            _entityData.Set("position", transform.position);
+            // 代理类型
+            _entityDataTag.Set("type", entityProxy?.Name ?? "");
+            // 名称
+            _entityDataTag.Set("name", gameObject.name);
+            // 坐标
+            _entityDataTag.Set("position", transform.position);
         }
 
         protected virtual void LoadFromEntityData()
         {
-            gameObject.layer = Layer;
-            transform.position = _entityData.TryGet("position", transform.position);
-            gameObject.name = _entityData.Get<string>("name");
+            transform.position = _entityDataTag.TryGet("position", transform.position);
+            gameObject.name = _entityDataTag.Get<string>("name");
         }
 
         protected virtual void SetCollider(Vector3 pos, float size)
@@ -189,19 +219,8 @@ namespace Island.Game.Entitys
                 _collider.enabled = true;
         }
 
-        /// <summary>
-        /// 实例化实体
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="container"></param>
-        /// <param name="entityName"></param>
-        /// <returns></returns>
-        public static T Create<T>(EntityContainer container, string entityName = null) where T : Entity
+        protected virtual void UpdateEntityState()
         {
-            if (container.IsGlobalContainer)
-                Debug.LogError("Can't create entity in a global entity container");
-
-            return (T) Create(container, typeof(T), entityName);
         }
 
         /// <summary>
@@ -211,12 +230,16 @@ namespace Island.Game.Entitys
         /// <param name="type"></param>
         /// <param name="entityName"></param>
         /// <returns></returns>
-        public static Entity Create(EntityContainer container, Type type, string entityName = null)
+        public static Entity Create(EntityContainer container, string entityName = null)
         {
             var entityObj = new GameObject(entityName == null ? "Entity" : entityName);
-            var entity = entityObj.AddComponent(type);
-            container.Add((Entity) entity);
-            return (Entity) entity;
+            entityObj.layer = Layer;
+
+            var entity = entityObj.AddComponent<Entity>();
+            container.Add(entity);
+            entity.Owner = container;
+
+            return entity;
         }
 #if UNITY_EDITOR
         [CustomEditor(typeof(Entity),editorForChildClasses:true)]
@@ -227,7 +250,11 @@ namespace Island.Game.Entitys
                 var entity = (Entity) serializedObject.targetObject;
 
                 if (!GameManager.IsInitializing)
+                {
                     GUILayout.Label("In Chunk: " + entity.ChunkPos);
+                    GUILayout.Label("Entity Type: " + entity.entityProxy?.Name);
+                    GUILayout.Label("Entity Data: " + entity._entityData);
+                }
                 base.OnInspectorGUI();
             }
         }

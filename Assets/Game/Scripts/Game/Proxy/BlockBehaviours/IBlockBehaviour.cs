@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Island.Game.Data.BlockBehaviours
+namespace Island.Game.Proxy.BlockBehaviours
 {
     public interface IBlockBehaviour
     {

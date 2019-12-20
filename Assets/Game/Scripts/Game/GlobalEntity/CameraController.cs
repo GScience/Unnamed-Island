@@ -8,7 +8,7 @@ using Island.Game.System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Island.Game.Entitys
+namespace Island.Game.GlobalEntity
 {
     /// <summary>
     /// 相机控制器

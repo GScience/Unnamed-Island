@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Island.Game.Render;
 using Island.Game.System;
 
-namespace Island.Game.Data.Blocks
+namespace Island.Game.Proxy.Blocks
 {
     public class Air : IBlock
     {
         public string Name => "island.block:air";
-        public void Load()
+        public void Init()
         {
         }
 
