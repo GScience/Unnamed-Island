@@ -156,12 +156,12 @@ namespace Island.Game.EntityBehaviour
 
         private void UpdateAction()
         {
-            if (_selectedEntity == null)
+            if (_selectedEntity == null || !_selectedEntity.IsAvailable)
                 ClearInteraction();
-
-            foreach (var playerAction in _playerAction)
-                if (Input.GetKeyDown(playerAction.Item1))
-                    playerAction.Item2?.Invoke();
+            else
+                foreach (var playerAction in _playerAction)
+                    if (Input.GetKeyDown(playerAction.Item1))
+                        playerAction.Item2?.Invoke();
         }
 
         private void UpdateSelectedEntity()
@@ -185,11 +185,10 @@ namespace Island.Game.EntityBehaviour
             // 没有选择任何物体
             if (_selectableEntityList.Count <= 0)
             {
-                if (_selectedEntity != null)
-                {
+                if (_selectedEntity != null && _selectedEntity.IsAvailable)
                     _selectedEntity.SendMessage("OnUnselected", this);
-                    _selectedEntity = null;
-                }
+
+                _selectedEntity = null;
             }
             else
             {
@@ -212,15 +211,14 @@ namespace Island.Game.EntityBehaviour
 
                 if (_selectedEntity != newSelectedEntity)
                 {
-                    if (_selectedEntity != null)
-                    {
+                    if (_selectedEntity != null && _selectedEntity.IsAvailable)
                         _selectedEntity.SendMessage("OnUnselected", this);
-                        ClearInteraction();
-                    }
+
+                    ClearInteraction();
 
                     _selectedEntity = newSelectedEntity;
 
-                    if (_selectedEntity != null)
+                    if (_selectedEntity != null && _selectedEntity.IsAvailable)
                         _selectedEntity.SendMessage("OnSelected", this);
                 }
             }

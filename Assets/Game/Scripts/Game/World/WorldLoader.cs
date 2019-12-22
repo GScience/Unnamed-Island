@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.IO.Compression;
 
 namespace Island.Game.World
 {
@@ -42,7 +43,8 @@ namespace Island.Game.World
             var savePath = _dir + "e." + filePath + ".dat";
             var saveTmpPath = savePath + ".tmp";
             var entityStream = File.Create(saveTmpPath);
-            var writer = new BinaryWriter(entityStream);
+            var compressFileStream = new GZipStream(entityStream, CompressionMode.Compress);
+            var writer = new BinaryWriter(compressFileStream);
 
             // 保存实体
             writer.Write(entityDataList.Count);
@@ -53,6 +55,7 @@ namespace Island.Game.World
             }
 
             writer.Close();
+            compressFileStream.Close();
             entityStream.Close();
 
             // 复制文件
@@ -107,7 +110,8 @@ namespace Island.Game.World
             }
 
             var entityStream = File.OpenRead(loadPath);
-            var reader = new BinaryReader(entityStream);
+            var decompressFileStream = new GZipStream(entityStream, CompressionMode.Decompress);
+            var reader = new BinaryReader(decompressFileStream);
 
             // 加载实体
             var entityCount = reader.ReadInt32();
@@ -121,6 +125,7 @@ namespace Island.Game.World
             }
 
             reader.Close();
+            decompressFileStream.Close();
             entityStream.Close();
         }
 
@@ -140,7 +145,8 @@ namespace Island.Game.World
             var savePath = _dir + "c." + chunkPos.x + "." + chunkPos.z + ".dat";
             var saveTmpPath = savePath + ".tmp";
             var chunkStream = File.Create(saveTmpPath);
-            var writer = new BinaryWriter(chunkStream);
+            var compressFileStream = new GZipStream(chunkStream, CompressionMode.Compress);
+            var writer = new BinaryWriter(compressFileStream);
 
             // 创建索引表
             List<string> blockIndex = new List<string>();
@@ -168,6 +174,7 @@ namespace Island.Game.World
                         blocks[x, y, z].WriteTo(writer, blockIndex);
 
             writer.Close();
+            compressFileStream.Close();
             chunkStream.Close();
 
             // 复制文件
@@ -218,7 +225,8 @@ namespace Island.Game.World
             }
 
             var chunkStream = File.OpenRead(chunkFilePath);
-            var reader = new BinaryReader(chunkStream);
+            var decompressFileStream = new GZipStream(chunkStream, CompressionMode.Decompress);
+            var reader = new BinaryReader(decompressFileStream);
 
             // 读取索引表
             var indexSize = reader.ReadInt32();
@@ -232,6 +240,7 @@ namespace Island.Game.World
                         blocks[x, y, z].ReadFrom(reader, blockIndex);
 
             reader.Close();
+            decompressFileStream.Close();
             chunkStream.Close();
         }
 
