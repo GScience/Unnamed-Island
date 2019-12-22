@@ -15,6 +15,7 @@ namespace Island.Game.World
     /// <summary>
     /// 实体抽象类
     /// 所有实体需要继承此类
+    /// 实体行为事件：EntityLoad, EntitySave, EntityUpdate, OnUnselected, OnSelected, OnKill
     /// </summary>
     public class Entity : MonoBehaviour
     {
@@ -88,6 +89,11 @@ namespace Island.Game.World
         }
 
         /// <summary>
+        /// 实体是否有效
+        /// </summary>
+        public bool IsAvailable { get; private set; } = false;
+
+        /// <summary>
         /// 设置实体数据
         /// </summary>
         /// <param name="entityData"></param>
@@ -155,10 +161,11 @@ namespace Island.Game.World
                 enabled = false;
         }
 
-        public void Kill()
+        public void Kill(Entity killBy)
         {
             Owner.Remove(this);
-            Destroy(gameObject);
+            _entityBehaviour.SendMessage("OnKill", killBy);
+            IsAvailable = false;
         }
 
         /// <summary>
@@ -209,6 +216,8 @@ namespace Island.Game.World
             gameObject.name = _entityDataTag.Get<string>("name");
 
             _entityBehaviour.SendMessage("EntityLoad", _entityDataTag);
+
+            IsAvailable = true;
         }
 
         public void SetCollider(Vector3 pos, float size)
@@ -241,7 +250,6 @@ namespace Island.Game.World
             entity.Owner = container;
 
             entity.SetEntityData(dataTag);
-
 
             if (entity.IsSelectable)
                 entityObj.layer = SelectableLayer;

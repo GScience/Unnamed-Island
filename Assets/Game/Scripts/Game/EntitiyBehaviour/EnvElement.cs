@@ -2,6 +2,7 @@
 using Island.Game.System;
 using Island.Game.World;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,54 @@ namespace Island.Game.EntityBehaviour
             _spriteRenderer2 = sprite2Object.AddComponent<SpriteRenderer>();
         }
 
+        IEnumerator KillAnimaCoroutine()
+        {
+            var alpha = 1f;
+            
+            while (alpha >= 0)
+            {
+                alpha -= Time.deltaTime * 5;
+
+                _spriteRenderer1.color = 
+                    new Color(
+                        _spriteRenderer1.color.r, 
+                        _spriteRenderer1.color.g, 
+                        _spriteRenderer1.color.b, 
+                        alpha);
+                _spriteRenderer2.color =
+                    new Color(
+                        _spriteRenderer2.color.r,
+                        _spriteRenderer2.color.g,
+                        _spriteRenderer2.color.b,
+                        alpha);
+
+                _spriteRenderer1.transform.position += Vector3.down * Time.deltaTime;
+                _spriteRenderer2.transform.position += Vector3.down * Time.deltaTime;
+
+                yield return 1;
+            }
+
+            var entityChunk = _entity.GetChunk();
+            if (entityChunk == null)
+                yield break;
+
+            entityChunk.CreateEntity(new DataTag(
+                new Dictionary<string, object>
+                {
+                                {"type", "island.entity:drop_item" },
+                                {"name", "dropItem" },
+                                {"position", transform.position + Vector3.up },
+                                {"velocity", Vector3.up },
+                                {"item", "island.item:dried_grass" }
+                }));
+            Destroy(gameObject);
+        }
+
+        void OnKill()
+        {
+            StartCoroutine(KillAnimaCoroutine());
+        }
+
         void OnSelected(Player player)
         {
             _spriteRenderer1.color = new Color(0.7f, 0.7f, 0.7f, 1);
@@ -49,19 +98,7 @@ namespace Island.Game.EntityBehaviour
 
         void OnPlayerCollect(Player player)
         {
-            var entityChunk = _entity.GetChunk();
-            if (entityChunk == null)
-                return;
-
-            entityChunk.CreateEntity(new DataTag(
-                new Dictionary<string, object>
-                {
-                    {"type", "island.entity:falling_item" },
-                    {"name", "fallingItem" },
-                    {"position", transform.position + Vector3.up },
-                    {"item", "island.item:dried_grass" }
-                }));
-            _entity.Kill();
+            _entity.Kill(null);
         }
 
         void OnUnselected(Player player)

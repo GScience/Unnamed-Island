@@ -11,14 +11,14 @@ namespace Island.Game.Proxy.Item
     {
         public override string Name => "island.item:dried_grass";
 
-        protected override string GetFallingSpriteName()
+        protected override string GetDropSpriteName()
         {
-            return "falling.dried_grass";
+            return "dried_grass.drop";
         }
 
         protected override string GetItemSpriteName()
         {
-            return "item.dried_grass";
+            return "dried_grass.item";
         }
     }
 }

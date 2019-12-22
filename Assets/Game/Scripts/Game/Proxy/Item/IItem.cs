@@ -9,7 +9,7 @@ namespace Island.Game.Proxy.Item
 {
     public interface IItem : IProxy
     {
-        Sprite GetFallingSprite();
+        Sprite GetDropSprite();
         Sprite GetItemSprite();
     }
 }

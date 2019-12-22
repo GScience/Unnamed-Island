@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Island.Game.Proxy.Entity
 {
-    class FallingItem : IEntity
+    class DropItem : IEntity
     {
-        public string Name => "island.entity:falling_item";
+        public string Name => "island.entity:drop_item";
 
         public Type GetEntityType()
         {
-            return typeof(EntityBehaviour.FallingItem);
+            return typeof(EntityBehaviour.DropItem);
         }
 
         public void Init()

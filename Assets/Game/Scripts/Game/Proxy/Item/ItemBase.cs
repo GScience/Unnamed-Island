@@ -10,17 +10,17 @@ namespace Island.Game.Proxy.Item
 {
     public abstract class ItemBase : IItem
     {
-        private Sprite _fallingSprite;
+        private Sprite _dropSprite;
         private Sprite _itemSprite;
 
         public abstract string Name { get; }
 
-        protected abstract string GetFallingSpriteName();
+        protected abstract string GetDropSpriteName();
         protected abstract string GetItemSpriteName();
 
-        public Sprite GetFallingSprite()
+        public Sprite GetDropSprite()
         {
-            return _fallingSprite;
+            return _dropSprite;
         }
 
         public Sprite GetItemSprite()
@@ -30,7 +30,7 @@ namespace Island.Game.Proxy.Item
 
         public virtual void Init()
         {
-            _fallingSprite = GameManager.ItemSpriteDatabase.Get(GetFallingSpriteName());
+            _dropSprite = GameManager.ItemSpriteDatabase.Get(GetDropSpriteName());
             _itemSprite = GameManager.ItemSpriteDatabase.Get(GetItemSpriteName());
         }
     }
