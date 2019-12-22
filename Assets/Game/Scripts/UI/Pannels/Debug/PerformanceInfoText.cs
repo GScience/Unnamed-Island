@@ -8,14 +8,14 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
 
-namespace Island
+namespace Island.UI.Pannels.Debug
 {
     /// <summary>
     /// 显示性能信息
     /// </summary>
     [RequireComponent(typeof(Text))]
     [ExecuteAlways]
-    class PerformanceInfo : MonoBehaviour
+    class PerformanceInfoText : MonoBehaviour
     {
         private Text _text;
         private float _time;
@@ -37,11 +37,8 @@ namespace Island
         {
             _text = GetComponent<Text>();
             _text.color = Color.white;
-        }
-
-        private void Start()
-        {
-            _text.canvas.sortingOrder = (int) UILayer.DebugInfo;
+            _time = 0;
+            _updateFrameCount = 0;
         }
         void Update()
         {

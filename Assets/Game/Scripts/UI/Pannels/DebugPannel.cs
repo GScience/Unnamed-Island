@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Island.UI.Pannels
 {
     [RequireComponent(typeof(Pannel))]
-    class GameLoadingPannel : MonoBehaviour
+    class DebugPannel : MonoBehaviour
     {
         private Pannel _pannel;
 
@@ -19,7 +19,7 @@ namespace Island.UI.Pannels
 
         private void Start()
         {
-            _pannel.Canvas.sortingOrder = (int) UILayer.GameLoadingPannel;
+            _pannel.Canvas.sortingOrder = (int)UILayer.DebugInfo;
         }
     }
 }

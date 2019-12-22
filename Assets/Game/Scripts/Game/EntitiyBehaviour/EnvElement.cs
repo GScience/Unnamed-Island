@@ -35,22 +35,39 @@ namespace Island.Game.EntityBehaviour
             _spriteRenderer2 = sprite2Object.AddComponent<SpriteRenderer>();
         }
 
-        void EntityUpdate()
+        void OnSelected(Player player)
         {
+            _spriteRenderer1.color = new Color(0.7f, 0.7f, 0.7f, 1);
+            _spriteRenderer2.color = new Color(0.7f, 0.7f, 0.7f, 1);
+
+            player.BindInteraction(KeyCode.F, "采集",
+            new Action(() =>
+            {
+                SendMessage("OnPlayerCollect", player);
+            }));
         }
 
-        void OnEntitySelectChange(bool selected)
+        void OnPlayerCollect(Player player)
         {
-            if (selected)
-            {
-                _spriteRenderer1.color = new Color(0.7f, 0.7f, 0.7f, 1);
-                _spriteRenderer2.color = new Color(0.7f, 0.7f, 0.7f, 1);
-            }
-            else
-            {
-                _spriteRenderer1.color = Color.white;
-                _spriteRenderer2.color = Color.white;
-            }
+            var entityChunk = _entity.GetChunk();
+            if (entityChunk == null)
+                return;
+
+            entityChunk.CreateEntity(new DataTag(
+                new Dictionary<string, object>
+                {
+                    {"type", "island.entity:falling_item" },
+                    {"name", "fallingItem" },
+                    {"position", transform.position + Vector3.up },
+                    {"item", "island.item:dried_grass" }
+                }));
+            _entity.Kill();
+        }
+
+        void OnUnselected(Player player)
+        {
+            _spriteRenderer1.color = Color.white;
+            _spriteRenderer2.color = Color.white;
         }
 
         void EntityLoad(DataTag dataTag)
@@ -63,7 +80,7 @@ namespace Island.Game.EntityBehaviour
                 envElement?.GetColliderCenter() ?? Vector3.zero,
                 envElement?.GetColliderSize() ?? 0);
 
-            _entity.HasUpdation = false;
+            _entity.IsSelectable = true;
         }
 
         void EntitySave(DataTag dataTag)

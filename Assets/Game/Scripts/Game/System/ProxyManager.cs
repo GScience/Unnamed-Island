@@ -27,7 +27,7 @@ namespace Island.Game.System
         public ProxyType Get<ProxyType>(string fullName) where ProxyType : IProxy
         {
             if (!_contentDict.TryGetValue(fullName.ToLower(), out var data))
-                Debug.LogError("Data " + fullName + " not found");
+                Debug.LogError("Data " + fullName + " not found in " + name);
             return (ProxyType) data;
         }
 

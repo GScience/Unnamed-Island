@@ -21,6 +21,7 @@ namespace Island.Game.System
         public static WorldManager WorldManager { get; private set; }
         public static BlockTextureManager BlockTextureManager { get; private set; }
         public static SpriteDatabase EnvElementSpriteDatabase { get; private set; }
+        public static SpriteDatabase ItemSpriteDatabase { get; private set; }
 
         public static Player PlayerController { get; private set; }
 
@@ -28,13 +29,16 @@ namespace Island.Game.System
         public Player playerController = null;
 
         public SpriteDatabase envElementSpriteDatabase;
+        public SpriteDatabase itemSpriteDatabase;
 
         private Pannel _gameLoadingPannel;
+        private Pannel _debugPannel;
 
         void Awake()
         {
             PlayerController = playerController;
             EnvElementSpriteDatabase = envElementSpriteDatabase;
+            ItemSpriteDatabase = itemSpriteDatabase;
 
             ProxyManager = GetComponent<ProxyManager>();
             WorldManager = GetComponent<WorldManager>();
@@ -50,6 +54,14 @@ namespace Island.Game.System
             {
                 _gameLoadingPannel.Close();
                 _gameLoadingPannel = null;
+            }
+
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                if (_debugPannel == null)
+                    _debugPannel = Pannel.Show("DebugPannel");
+                else
+                    _debugPannel.Close();
             }
         }
     }

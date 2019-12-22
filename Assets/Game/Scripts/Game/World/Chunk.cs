@@ -47,9 +47,22 @@ namespace Island.Game.World
             _blockContainer.SetSize(containerSize, blockSize);
         }
 
+        /// <summary>
+        /// 将实体添加到Chunk，若想创建实体请使用<code>Chunk.CreateEntity(DataTag dataTag)</code>
+        /// </summary>
+        /// <param name="entity"></param>
         public void AddEntity(Entity entity)
         {
             _entityContainer.Add(entity);
+        }
+
+        /// <summary>
+        /// 创建实体
+        /// </summary>
+        /// <param name="dataTag"></param>
+        public void CreateEntity(DataTag dataTag)
+        {
+            Entity.Create(_entityContainer, dataTag);
         }
 
         public Task AsyncLoadTask(ChunkPos chunkPos)

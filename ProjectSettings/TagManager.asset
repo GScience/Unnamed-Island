@@ -14,8 +14,8 @@ TagManager:
   - 
   - 
   - Entity
-  - 
-  - 
+  - SelectableEntity
+  - BlockContainer
   - 
   - 
   - 

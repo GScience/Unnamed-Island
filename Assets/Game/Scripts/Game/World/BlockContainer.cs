@@ -14,6 +14,8 @@ namespace Island.Game.World
 {
     public class BlockContainer : MonoBehaviour
     {
+        public const int Layer = 10;
+
         public Vector3 BlockSize { get; private set; } = Vector3.zero;
         public Vector3Int ContainerSize { get; private set; } = Vector3Int.zero;
 
@@ -35,6 +37,7 @@ namespace Island.Game.World
         public void Start()
         {
             _air = GameManager.ProxyManager.Get<IBlock>("island.block:air");
+            gameObject.layer = Layer;
         }
 
         public void SetSize(Vector3Int containerSize, Vector3 blockSize)

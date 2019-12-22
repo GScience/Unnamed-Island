@@ -25,7 +25,7 @@ namespace Island.Game.Proxy.EnvElements
 
         protected abstract string GetSpriteName();
 
-        public void Init()
+        public virtual void Init()
         {
             _sprite = GameManager.EnvElementSpriteDatabase.Get(GetSpriteName());
         }

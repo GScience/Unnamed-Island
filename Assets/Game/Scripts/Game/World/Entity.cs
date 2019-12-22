@@ -19,20 +19,19 @@ namespace Island.Game.World
     public class Entity : MonoBehaviour
     {
         /// <summary>
-        /// 所有Entity所在层
+        /// 不可选实体所在层
         /// </summary>
         public const int Layer = 8;
 
         /// <summary>
+        /// 可选择实体所在层
+        /// </summary>
+        public const int SelectableLayer = 9;
+
+        /// <summary>
         /// 实体是否被选择
         /// </summary>
-        public bool IsSelected
-        {
-            set
-            {
-                SendMessage("OnEntitySelectChange", value, SendMessageOptions.DontRequireReceiver);
-            }
-        }
+        public bool IsSelectable { get; set; } = false;
 
         /// <summary>
         /// 实体所在区块
@@ -56,7 +55,7 @@ namespace Island.Game.World
         /// <summary>
         /// 是否有刷新事件
         /// </summary>
-        public bool HasUpdation { get; set; }
+        public bool HasUpdation { get; set; } = false;
 
         /// <summary>
         /// 实体代理
@@ -149,11 +148,17 @@ namespace Island.Game.World
             }
 
             // 刷新实体移动
-            if (_canMove)
+            if (_canMove && HasUpdation)
                 _entityBehaviour.SendMessage("EntityUpdate");
 
             if (!HasUpdation)
                 enabled = false;
+        }
+
+        public void Kill()
+        {
+            Owner.Remove(this);
+            Destroy(gameObject);
         }
 
         /// <summary>
@@ -230,13 +235,18 @@ namespace Island.Game.World
         public static Entity Create(EntityContainer container, DataTag dataTag)
         {
             var entityObj = new GameObject(dataTag.Get<string>("name"));
-            entityObj.layer = Layer;
 
             var entity = entityObj.AddComponent<Entity>();
             container.Add(entity);
             entity.Owner = container;
 
             entity.SetEntityData(dataTag);
+
+
+            if (entity.IsSelectable)
+                entityObj.layer = SelectableLayer;
+            else
+                entityObj.layer = Layer;
 
             return entity;
         }

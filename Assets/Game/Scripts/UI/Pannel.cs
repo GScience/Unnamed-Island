@@ -18,7 +18,7 @@ namespace Island.UI
 
         private Fader _fader;
         private Animation _animation;
-        public Canvas canvas;
+        public Canvas Canvas { get; private set; }
 
         public AnimationClip showAnim;
         public AnimationClip closeAnim;
@@ -32,7 +32,7 @@ namespace Island.UI
                 _fader = GetComponent<Fader>();
             else
                 _animation = GetComponent<Animation>();
-            canvas = GetComponent<Canvas>();
+            Canvas = GetComponent<Canvas>();
         }
 
         private void Start()

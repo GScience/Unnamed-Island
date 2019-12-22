@@ -21,7 +21,11 @@ namespace Island.Game.System
 
         public Sprite Get(string spriteName)
         {
-            return _spriteDict[spriteName.ToLower()];
+            if (_spriteDict.TryGetValue(spriteName.ToLower(), out var result))
+                return result;
+
+            Debug.LogError("Sprite " + spriteName + " not found in " + name);
+            return null;
         }
     }
 }
