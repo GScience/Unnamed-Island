@@ -14,7 +14,7 @@ namespace Island.Game.EntityBehaviour
     /// Íæ¼ÒÊµÌå
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
-    class Player : MonoBehaviour
+    class PlayerBehaviour : MonoBehaviour
     {
         public SkeletonAnimation skeletonAnim;
         private CharacterController _controller;

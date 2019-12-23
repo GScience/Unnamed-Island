@@ -15,7 +15,7 @@ namespace Island.Game.EntityBehaviour
     /// 相机控制器
     /// </summary>
     [RequireComponent(typeof(CinemachineVirtualCamera), typeof(Entity))]
-    class GameCamera : MonoBehaviour
+    class GameCameraBehaviour : MonoBehaviour
     {
         private CinemachineVirtualCamera _virtualCamera;
         private CinemachineFramingTransposer _cameraBody;

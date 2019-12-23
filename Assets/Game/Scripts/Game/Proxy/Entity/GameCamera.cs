@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Island.Game.EntityBehaviour;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,11 @@ namespace Island.Game.Proxy.Entity
     {
         public string Name => "island.entity:game_camera";
 
-        public Type GetEntityType()
-        {
-            return typeof(EntityBehaviour.GameCamera);
-        }
+        public Type[] EntityBehaviours =>
+            new Type[]
+            {
+                typeof(GameCameraBehaviour)
+            };
 
         public void Init()
         {

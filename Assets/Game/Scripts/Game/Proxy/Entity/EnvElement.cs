@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Island.Game.EntityBehaviour;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,11 @@ namespace Island.Game.Proxy.Entity
     {
         public string Name => "island.entity:env_element";
 
-        public Type GetEntityType()
-        {
-            return typeof(EntityBehaviour.EnvElement);
-        }
+        public Type[] EntityBehaviours =>
+            new Type[]
+            {
+                typeof(EnvElementBehaviour)
+            };
 
         public void Init()
         {

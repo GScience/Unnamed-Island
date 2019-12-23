@@ -8,6 +8,6 @@ namespace Island.Game.Proxy.Entity
 {
     public interface IEntity : IProxy
     {
-        Type GetEntityType();
+        Type[] EntityBehaviours { get; }
     }
 }

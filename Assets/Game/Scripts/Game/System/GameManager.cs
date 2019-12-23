@@ -23,10 +23,10 @@ namespace Island.Game.System
         public static SpriteDatabase EnvElementSpriteDatabase { get; private set; }
         public static SpriteDatabase ItemSpriteDatabase { get; private set; }
 
-        public static Player PlayerController { get; private set; }
+        public static PlayerBehaviour PlayerController { get; private set; }
 
         public static bool IsInitializing => WorldManager == null || WorldManager.IsInitializing;
-        public Player playerController = null;
+        public PlayerBehaviour playerController = null;
 
         public SpriteDatabase envElementSpriteDatabase;
         public SpriteDatabase itemSpriteDatabase;

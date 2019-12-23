@@ -12,7 +12,7 @@ using UnityEngine;
 namespace Island.Game.EntityBehaviour
 {
     [RequireComponent(typeof(Entity))]
-    public class EnvElement : MonoBehaviour
+    public class EnvElementBehaviour : MonoBehaviour
     {
         private Entity _entity;
         private SpriteRenderer _spriteRenderer1;
@@ -84,7 +84,7 @@ namespace Island.Game.EntityBehaviour
             StartCoroutine(KillAnimaCoroutine());
         }
 
-        void OnSelected(Player player)
+        void OnSelected(PlayerBehaviour player)
         {
             _spriteRenderer1.color = new Color(0.7f, 0.7f, 0.7f, 1);
             _spriteRenderer2.color = new Color(0.7f, 0.7f, 0.7f, 1);
@@ -96,12 +96,12 @@ namespace Island.Game.EntityBehaviour
             }));
         }
 
-        void OnPlayerCollect(Player player)
+        void OnPlayerCollect(PlayerBehaviour player)
         {
             _entity.Kill(null);
         }
 
-        void OnUnselected(Player player)
+        void OnUnselected(PlayerBehaviour player)
         {
             _spriteRenderer1.color = Color.white;
             _spriteRenderer2.color = Color.white;

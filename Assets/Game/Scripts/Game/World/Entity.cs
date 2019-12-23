@@ -64,11 +64,6 @@ namespace Island.Game.World
         private IEntity _entityProxy;
 
         /// <summary>
-        /// 实体行为
-        /// </summary>
-        private MonoBehaviour _entityBehaviour;
-
-        /// <summary>
         /// 实体数据，用于序列化和反序列化
         /// </summary>
         private DataTag _entityDataTag = DataTag.Empty();
@@ -102,15 +97,11 @@ namespace Island.Game.World
             // 设置代理
             var entityProxyName = entityData.Get<string>("type");
 
+            // 创建行为
             _entityProxy = GameManager.ProxyManager.Get<IEntity>(entityProxyName);
-            var entityBehaviourType = _entityProxy.GetEntityType();
-
-            // 尝试直接获取
-            _entityBehaviour = (MonoBehaviour)gameObject.GetComponent(entityBehaviourType);
-
-            // 创建
-            if (_entityBehaviour == null)
-                _entityBehaviour = (MonoBehaviour)gameObject.AddComponent(entityBehaviourType);
+            foreach (var entityBehaviour in _entityProxy.EntityBehaviours)
+                if (gameObject.GetComponent(entityBehaviour) == null)
+                    gameObject.AddComponent(entityBehaviour);
 
             // 同步标签
             _entityDataTag = entityData;
@@ -155,7 +146,7 @@ namespace Island.Game.World
 
             // 刷新实体移动
             if (_canMove && HasUpdation)
-                _entityBehaviour.SendMessage("EntityUpdate");
+                gameObject.SendMessage("EntityUpdate");
 
             if (!HasUpdation)
                 enabled = false;
@@ -164,7 +155,7 @@ namespace Island.Game.World
         public void Kill(Entity killBy)
         {
             Owner.Remove(this);
-            _entityBehaviour.SendMessage("OnKill", killBy);
+            gameObject.SendMessage("OnKill", killBy);
             IsAvailable = false;
         }
 
@@ -197,9 +188,6 @@ namespace Island.Game.World
 
         private void SaveToEntityDataTag()
         {
-            if (_entityBehaviour == null)
-                return;
-
             // 代理类型
             _entityDataTag.Set("type", _entityProxy?.Name ?? "");
             // 名称
@@ -207,7 +195,7 @@ namespace Island.Game.World
             // 坐标
             _entityDataTag.Set("position", transform.position);
 
-            _entityBehaviour.SendMessage("EntitySave", _entityDataTag);
+            gameObject.SendMessage("EntitySave", _entityDataTag);
         }
 
         private void LoadFromEntityData()
@@ -215,7 +203,7 @@ namespace Island.Game.World
             transform.position = _entityDataTag.TryGet("position", transform.position);
             gameObject.name = _entityDataTag.Get<string>("name");
 
-            _entityBehaviour.SendMessage("EntityLoad", _entityDataTag);
+            gameObject.SendMessage("EntityLoad", _entityDataTag);
 
             IsAvailable = true;
         }

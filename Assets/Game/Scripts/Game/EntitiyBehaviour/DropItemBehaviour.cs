@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Island.Game.EntityBehaviour
 {
     [RequireComponent(typeof(Entity))]
-    public class DropItem : MonoBehaviour
+    public class DropItemBehaviour : MonoBehaviour
     {
         private Entity _entity;
         private SpriteRenderer _spriteRenderer;
@@ -32,7 +32,7 @@ namespace Island.Game.EntityBehaviour
             spriteObject.AddComponent<Billboard>();
         }
 
-        void OnSelected(Player player)
+        void OnSelected(PlayerBehaviour player)
         {
             _spriteRenderer.color = new Color(0.7f, 0.7f, 0.7f, 1);
 
@@ -60,12 +60,12 @@ namespace Island.Game.EntityBehaviour
             }
         }
 
-        void OnPlayerPickup(Player player)
+        void OnPlayerPickup(PlayerBehaviour player)
         {
 
         }
 
-        void OnUnselected(Player player)
+        void OnUnselected(PlayerBehaviour player)
         {
             _spriteRenderer.color = Color.white;
         }
