@@ -111,8 +111,13 @@ namespace Island.Game.EntityBehaviour
         {
             var envElementName = dataTag.Get<string>("envElement");
             envElement = GameManager.ProxyManager.Get<IEnvElement>(envElementName);
+
+            _spriteRenderer1.material = GameManager.WorldManager.entityMaterial;
+            _spriteRenderer2.material = GameManager.WorldManager.entityMaterial;
+
             _spriteRenderer1.sprite = envElement?.GetEnvElementSprite();
             _spriteRenderer2.sprite = envElement?.GetEnvElementSprite();
+
             _entity.SetCollider(
                 envElement?.GetColliderCenter() ?? Vector3.zero,
                 envElement?.GetColliderSize() ?? 0);

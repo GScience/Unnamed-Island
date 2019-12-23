@@ -81,6 +81,8 @@ namespace Island.Game.EntityBehaviour
                Vector3.zero,
                0.5f);
             velocity = dataTag.Get<Vector3>("velocity");
+
+            _spriteRenderer.material = GameManager.WorldManager.entityMaterial;
         }
 
         void EntitySave(DataTag dataTag)

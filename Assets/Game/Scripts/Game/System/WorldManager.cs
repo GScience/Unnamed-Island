@@ -104,6 +104,11 @@ namespace Island.Game.System
         /// </summary>
         public EntityContainer globalEntityContainer;
 
+        /// <summary>
+        /// 实体材质
+        /// </summary>
+        public Material entityMaterial;
+
         void Awake()
         {
             worldInfo = FindObjectOfType<WorldInfo>();
