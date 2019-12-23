@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.IO.Compression;
+using Island.Game.Proxy.Blocks;
 
 namespace Island.Game.World
 {
@@ -230,9 +231,12 @@ namespace Island.Game.World
 
             // 读取索引表
             var indexSize = reader.ReadInt32();
-            var blockIndex = new List<string>(indexSize);
+            var blockIndex = new List<IBlock>(indexSize);
             for (var i = 0; i < indexSize; ++i)
-                blockIndex.Add(reader.ReadString());
+            {
+                var blockName = reader.ReadString();
+                blockIndex.Add(GameManager.ProxyManager.Get<IBlock>(blockName));
+            }
 
             for (var x = 0; x < chunkSize.x; ++x)
                 for (var y = 0; y < chunkSize.y; ++y)

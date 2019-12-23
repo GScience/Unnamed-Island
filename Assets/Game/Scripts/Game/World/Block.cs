@@ -27,15 +27,14 @@ namespace Island.Game.World
             writer.Write(index);
         }
 
-        public void ReadFrom(BinaryReader reader, List<string> blockIndex)
+        public void ReadFrom(BinaryReader reader, List<IBlock> blockIndex)
         {
             if (reader == null)
                 blockProxy = GameManager.ProxyManager.Get<IBlock>("island.block:air");
             else
             {
                 var index = reader.ReadInt16();
-                var blockName = blockIndex[index];
-                blockProxy = GameManager.ProxyManager.Get<IBlock>(blockName);
+                blockProxy = blockIndex[index];
             }
         }
     }
