@@ -15,11 +15,10 @@ namespace Island.Game.EntityBehaviour
     /// 相机控制器
     /// </summary>
     [RequireComponent(typeof(CinemachineVirtualCamera), typeof(Entity))]
-    class GameCameraBehaviour : MonoBehaviour
+    class GameCameraBehaviour : EntityBehaviour
     {
         private CinemachineVirtualCamera _virtualCamera;
         private CinemachineFramingTransposer _cameraBody;
-        private Entity _entity;
 
         public float rotateSpeed = 10.0f;
         public float smooth = 0.1f;
@@ -35,20 +34,20 @@ namespace Island.Game.EntityBehaviour
         public float minXRot = 30;
         public float maxXRot = 60;
 
-        void Awake()
+        protected override void Init()
         {
-            _virtualCamera = GetComponent<CinemachineVirtualCamera>();
-            _entity = GetComponent<Entity>();
+            
         }
 
-        void Start()
+        private void Awake()
         {
-            _cameraBody = (CinemachineFramingTransposer) _virtualCamera.GetCinemachineComponent(CinemachineCore.Stage.Body);
+            _virtualCamera = GetComponent<CinemachineVirtualCamera>();
+            _cameraBody = (CinemachineFramingTransposer)_virtualCamera.GetCinemachineComponent(CinemachineCore.Stage.Body);
         }
 
         void EntityLoad(DataTag dataTag)
         {
-            _entity.HasUpdation = false;
+            entity.HasUpdation = false;
             var yRot = dataTag.TryGet("yRot", 45.0f);
             var xRot = dataTag.TryGet("xRot", minXRot);
             transform.rotation = Quaternion.Euler(xRot, yRot, transform.rotation.z);

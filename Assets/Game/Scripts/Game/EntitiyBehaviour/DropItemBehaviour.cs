@@ -13,19 +13,16 @@ using UnityEngine;
 namespace Island.Game.EntityBehaviour
 {
     [RequireComponent(typeof(Entity))]
-    public class DropItemBehaviour : MonoBehaviour
+    public class DropItemBehaviour : EntityBehaviour
     {
-        private Entity _entity;
         private SpriteRenderer _spriteRenderer;
 
         public Vector3 velocity;
         
         public IItem item;
 
-        void Awake()
+        protected override void Init()
         {
-            _entity = GetComponent<Entity>();
-
             var spriteObject = new GameObject("sprite");
             spriteObject.transform.parent = transform;
             _spriteRenderer = spriteObject.AddComponent<SpriteRenderer>();
@@ -75,9 +72,9 @@ namespace Island.Game.EntityBehaviour
             var itemName = dataTag.Get<string>("item");
             item = GameManager.ProxyManager.Get<IItem>(itemName);
             _spriteRenderer.sprite = item?.GetDropSprite();
-            _entity.IsSelectable = true;
-            _entity.HasUpdation = true;
-            _entity.SetCollider(
+            entity.IsSelectable = true;
+            entity.HasUpdation = true;
+            entity.SetCollider(
                Vector3.zero,
                0.5f);
             velocity = dataTag.Get<Vector3>("velocity");

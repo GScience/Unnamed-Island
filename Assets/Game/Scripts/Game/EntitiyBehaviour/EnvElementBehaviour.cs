@@ -11,19 +11,15 @@ using UnityEngine;
 
 namespace Island.Game.EntityBehaviour
 {
-    [RequireComponent(typeof(Entity))]
-    public class EnvElementBehaviour : MonoBehaviour
+    public class EnvElementBehaviour : EntityBehaviour
     {
-        private Entity _entity;
         private SpriteRenderer _spriteRenderer1;
         private SpriteRenderer _spriteRenderer2;
 
         public IEnvElement envElement;
 
-        void Awake()
+        protected override void Init()
         {
-            _entity = GetComponent<Entity>();
-
             var sprite1Object = new GameObject("sprite1");
             var sprite2Object = new GameObject("sprite2");
             sprite1Object.transform.parent = transform;
@@ -63,7 +59,7 @@ namespace Island.Game.EntityBehaviour
                 yield return 1;
             }
 
-            var entityChunk = _entity.GetChunk();
+            var entityChunk = entity.GetChunk();
             if (entityChunk == null)
                 yield break;
 
@@ -98,7 +94,7 @@ namespace Island.Game.EntityBehaviour
 
         void OnPlayerCollect(PlayerBehaviour player)
         {
-            _entity.Kill(null);
+            entity.Kill(null);
         }
 
         void OnUnselected(PlayerBehaviour player)
@@ -118,11 +114,11 @@ namespace Island.Game.EntityBehaviour
             _spriteRenderer1.sprite = envElement?.GetEnvElementSprite();
             _spriteRenderer2.sprite = envElement?.GetEnvElementSprite();
 
-            _entity.SetCollider(
+            entity.SetCollider(
                 envElement?.GetColliderCenter() ?? Vector3.zero,
                 envElement?.GetColliderSize() ?? 0);
 
-            _entity.IsSelectable = true;
+            entity.IsSelectable = true;
         }
 
         void EntitySave(DataTag dataTag)

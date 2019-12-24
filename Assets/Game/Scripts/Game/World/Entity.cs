@@ -103,6 +103,8 @@ namespace Island.Game.World
                 if (gameObject.GetComponent(entityBehaviour) == null)
                     gameObject.AddComponent(entityBehaviour);
 
+            gameObject.SendMessage("OnEntityCreated");
+
             // 同步标签
             _entityDataTag = entityData;
 

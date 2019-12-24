@@ -37,9 +37,9 @@ namespace Island.Game.System
 
             BlocksMaterial = new Material(shader)
             {
-                mainTexture = BlocksTexture
+                mainTexture = BlocksTexture,
             };
-
+            
             var x = 0;
             var y = 0;
 

@@ -6,15 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.Game.EntitiyBehaviour
+namespace Island.Game.EntityBehaviour
 {
-    public class EntityBehaviour : MonoBehaviour
+    public abstract class EntityBehaviour : MonoBehaviour
     {
-        private Entity _entity;
+        protected Entity entity;
 
-        protected virtual void Awake()
+        private void OnEntityCreated()
         {
-            _entity = GetComponent<Entity>();
+            entity = GetComponent<Entity>();
+            Init();
         }
+
+        protected abstract void Init();
     }
 }

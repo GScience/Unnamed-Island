@@ -14,11 +14,10 @@ namespace Island.Game.EntityBehaviour
     /// Íæ¼ÒÊµÌå
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
-    class PlayerBehaviour : MonoBehaviour
+    class PlayerBehaviour : EntityBehaviour
     {
         public SkeletonAnimation skeletonAnim;
         private CharacterController _controller;
-        private Entity _entity;
 
         private List<Entity> _selectableEntityList = new List<Entity>();
         private Collider[] _selectedEntities = new Collider[20];
@@ -39,17 +38,16 @@ namespace Island.Game.EntityBehaviour
         private float _gravitySpeed;
 
         private PlayerInteractionPannel _playerInteractionPannel;
-        
-        void Awake()
-        {
-            _controller = GetComponent<CharacterController>();
-            _entity = GetComponent<Entity>();
-        }
 
-        void Start()
+        protected override void Init()
         {
             _playerInteractionPannel = Pannel.Show("PlayerInteractionPannel").GetComponent<PlayerInteractionPannel>();
-            _entity.HasUpdation = true;
+            entity.HasUpdation = true;
+        }
+
+        private void Awake()
+        {
+            _controller = GetComponent<CharacterController>();
         }
 
         private void OnDrawGizmos()
@@ -68,7 +66,7 @@ namespace Island.Game.EntityBehaviour
 
         void EntityLoad(DataTag dataTag)
         {
-            _entity.HasUpdation = true;
+            entity.HasUpdation = true;
         }
 
         void EntitySave(DataTag dataTag)
