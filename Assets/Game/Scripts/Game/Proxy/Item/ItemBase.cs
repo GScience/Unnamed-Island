@@ -33,5 +33,7 @@ namespace Island.Game.Proxy.Item
             _dropSprite = GameManager.ItemSpriteDatabase.Get(GetDropSpriteName());
             _itemSprite = GameManager.ItemSpriteDatabase.Get(GetItemSpriteName());
         }
+
+        public abstract int GetMaxStackCount();
     }
 }

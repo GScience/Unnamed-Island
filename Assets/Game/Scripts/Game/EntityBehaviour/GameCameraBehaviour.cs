@@ -45,9 +45,9 @@ namespace Island.Game.EntityBehaviour
             _cameraBody = (CinemachineFramingTransposer)_virtualCamera.GetCinemachineComponent(CinemachineCore.Stage.Body);
         }
 
-        void EntityLoad(DataTag dataTag)
+        protected override void EntityLoad(DataTag dataTag)
         {
-            entity.HasUpdation = false;
+            Entity.HasUpdation = false;
             var yRot = dataTag.TryGet("yRot", 45.0f);
             var xRot = dataTag.TryGet("xRot", minXRot);
             transform.rotation = Quaternion.Euler(xRot, yRot, transform.rotation.z);
@@ -55,13 +55,13 @@ namespace Island.Game.EntityBehaviour
             UpdateCameraDistance();
         }
 
-        void EntitySave(DataTag dataTag)
+        protected override void EntitySave(DataTag dataTag)
         {
             dataTag.Set("yRot", transform.rotation.eulerAngles.y);
             dataTag.Set("xRot", transform.rotation.eulerAngles.x);
         }
 
-        void EntityUpdate()
+        protected override void EntityUpdate()
         {
         }
 

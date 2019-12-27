@@ -1,4 +1,5 @@
-﻿using Island.Game.Proxy.EnvElements;
+﻿using island.Game.Extension.World;
+using Island.Game.Proxy.EnvElements;
 using Island.Game.System;
 using Island.Game.World;
 using System;
@@ -32,7 +33,7 @@ namespace Island.Game.EntityBehaviour
             _spriteRenderer2 = sprite2Object.AddComponent<SpriteRenderer>();
         }
 
-        IEnumerator KillAnimaCoroutine()
+        IEnumerator KillAnimaCoroutine(PlayerBehaviour player)
         {
             var alpha = 1f;
             
@@ -59,28 +60,16 @@ namespace Island.Game.EntityBehaviour
                 yield return 1;
             }
 
-            var entityChunk = entity.GetChunk();
+            var entityChunk = Entity.GetChunk();
             if (entityChunk == null)
                 yield break;
 
-            entityChunk.CreateEntity(new DataTag(
-                new Dictionary<string, object>
-                {
-                                {"type", "island.entity:drop_item" },
-                                {"name", "dropItem" },
-                                {"position", transform.position + Vector3.up },
-                                {"velocity", Vector3.up },
-                                {"item", "island.item:dried_grass" }
-                }));
-            Destroy(gameObject);
+            entityChunk.CreateDropItem("island.item:dried_grass", 1, transform.position);
+
+            Entity.BeKilled(player.Entity);
         }
 
-        void OnKill()
-        {
-            StartCoroutine(KillAnimaCoroutine());
-        }
-
-        void OnSelected(PlayerBehaviour player)
+        protected override void OnSelected(PlayerBehaviour player)
         {
             _spriteRenderer1.color = new Color(0.7f, 0.7f, 0.7f, 1);
             _spriteRenderer2.color = new Color(0.7f, 0.7f, 0.7f, 1);
@@ -94,16 +83,16 @@ namespace Island.Game.EntityBehaviour
 
         void OnPlayerCollect(PlayerBehaviour player)
         {
-            entity.Kill(null);
+            StartCoroutine(KillAnimaCoroutine(player));
         }
 
-        void OnUnselected(PlayerBehaviour player)
+        protected override void OnUnselected(PlayerBehaviour player)
         {
             _spriteRenderer1.color = Color.white;
             _spriteRenderer2.color = Color.white;
         }
 
-        void EntityLoad(DataTag dataTag)
+        protected override void EntityLoad(DataTag dataTag)
         {
             var envElementName = dataTag.Get<string>("envElement");
             envElement = GameManager.ProxyManager.Get<IEnvElement>(envElementName);
@@ -114,14 +103,14 @@ namespace Island.Game.EntityBehaviour
             _spriteRenderer1.sprite = envElement?.GetEnvElementSprite();
             _spriteRenderer2.sprite = envElement?.GetEnvElementSprite();
 
-            entity.SetCollider(
+            Entity.SetCollider(
                 envElement?.GetColliderCenter() ?? Vector3.zero,
                 envElement?.GetColliderSize() ?? 0);
 
-            entity.IsSelectable = true;
+            Entity.IsSelectable = true;
         }
 
-        void EntitySave(DataTag dataTag)
+        protected override void EntitySave(DataTag dataTag)
         {
             dataTag.Set("envElement", envElement.Name);
         }

@@ -11,5 +11,7 @@ namespace Island.Game.Proxy.Item
     {
         Sprite GetDropSprite();
         Sprite GetItemSprite();
+
+        int GetMaxStackCount();
     }
 }

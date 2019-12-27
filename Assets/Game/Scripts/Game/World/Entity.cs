@@ -37,11 +37,7 @@ namespace Island.Game.World
         /// <summary>
         /// 实体所在区块
         /// </summary>
-        public ChunkPos ChunkPos => new ChunkPos(
-            Mathf.FloorToInt(transform.position.x / 
-                (GameManager.WorldManager.ChunkSize.x * GameManager.WorldManager.BlockSize.x)), 
-            Mathf.FloorToInt(transform.position.z / 
-                (GameManager.WorldManager.ChunkSize.z * GameManager.WorldManager.BlockSize.z)));
+        public ChunkPos ChunkPos => new ChunkPos(transform.position);
 
         /// <summary>
         /// 实体所有者（实体容器）
@@ -154,11 +150,17 @@ namespace Island.Game.World
                 enabled = false;
         }
 
-        public void Kill(Entity killBy)
+        public void BeAttacked(Entity attackBy)
+        {
+            gameObject.SendMessage("OnAttack", attackBy);
+        }
+
+        public void BeKilled(Entity killBy)
         {
             Owner.Remove(this);
             gameObject.SendMessage("OnKill", killBy);
             IsAvailable = false;
+            Destroy(gameObject);
         }
 
         /// <summary>

@@ -13,8 +13,8 @@ namespace Island.Game.EntityBehaviour
     /// <summary>
     /// Íæ¼ÒÊµÌå
     /// </summary>
-    [RequireComponent(typeof(CharacterController))]
-    class PlayerBehaviour : EntityBehaviour
+    [RequireComponent(typeof(CharacterController), typeof(InventoryBehaviour))]
+    public class PlayerBehaviour : EntityBehaviour
     {
         public SkeletonAnimation skeletonAnim;
         private CharacterController _controller;
@@ -39,10 +39,15 @@ namespace Island.Game.EntityBehaviour
 
         private PlayerInteractionPannel _playerInteractionPannel;
 
+        public InventoryBehaviour Inventory { get; private set; }
+
         protected override void Init()
         {
+            Inventory = GetEntityBehaviour<InventoryBehaviour>();
+            Inventory.InventorySize = 20;
+
             _playerInteractionPannel = Pannel.Show("PlayerInteractionPannel").GetComponent<PlayerInteractionPannel>();
-            entity.HasUpdation = true;
+            Entity.HasUpdation = true;
         }
 
         private void Awake()
@@ -64,16 +69,16 @@ namespace Island.Game.EntityBehaviour
             _controller.enabled = false;
         }
 
-        void EntityLoad(DataTag dataTag)
+        protected override void EntityLoad(DataTag dataTag)
         {
-            entity.HasUpdation = true;
+            Entity.HasUpdation = true;
         }
 
-        void EntitySave(DataTag dataTag)
+        protected override void EntitySave(DataTag dataTag)
         {
         }
 
-        void EntityUpdate()
+        protected override void EntityUpdate()
         {
             UpdateAction();
             UpdateSelectedEntity();

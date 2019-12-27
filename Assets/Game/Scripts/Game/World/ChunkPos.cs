@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Island.Game.System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Island.Game.World
 {
@@ -18,6 +20,15 @@ namespace Island.Game.World
         {
             this.x = x;
             this.z = z;
+        }
+
+        public ChunkPos(Vector3 pos) :
+            this(
+                Mathf.FloorToInt(pos.x /
+                    (GameManager.WorldManager.ChunkSize.x * GameManager.WorldManager.BlockSize.x)),
+                Mathf.FloorToInt(pos.z /
+                    (GameManager.WorldManager.ChunkSize.z * GameManager.WorldManager.BlockSize.z)))
+        {
         }
 
         public bool IsAvailable()

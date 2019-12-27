@@ -20,5 +20,10 @@ namespace Island.Game.Proxy.Item
         {
             return "dried_grass.item";
         }
+
+        public override int GetMaxStackCount()
+        {
+            return 32;
+        }
     }
 }
