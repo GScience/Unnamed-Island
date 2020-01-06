@@ -12,7 +12,9 @@ namespace Island.UI
     public enum UILayer : int
     {
         PlayerInfo = 1,
-        Inventory = 2,
+        PlayerInventory = 11,
+        PopInventory = 21,
+        SelectedItem = 91,
 
         WorldCreatingPannel = 101,
         GameLoadingPannel = 102,

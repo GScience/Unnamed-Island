@@ -52,7 +52,7 @@ namespace Island.Game.EntityBehaviour
                 var distPos = _pickupBy.Entity.transform.position + Vector3.up * 0.5f;
 
                 // 和玩家重合后捡起物品
-                if (Vector3.Distance(distPos, transform.position) < 0.5f)
+                if (Vector3.Distance(distPos, transform.position) < 0.75f)
                 {
                     _spriteRenderer.color = 
                         new Color(
@@ -64,19 +64,20 @@ namespace Island.Game.EntityBehaviour
                     // 捡到物品
                     if (_spriteRenderer.color.a <= float.Epsilon)
                     {
-                        item = _pickupBy.AddItem(item);
+                        _pickupBy.AddItem(ref item);
                         if (item.count == 0)
                         {
                             Entity.BeKilled(_pickupBy.Entity);
                             return;
                         }
                         _pickupBy = null;
+                        _spriteRenderer.color = new Color(_spriteRenderer.color.r, _spriteRenderer.color.g, _spriteRenderer.color.b, 1);
                     }
                 }
                 else
                 {
                     // 继续计算速度
-                    velocity = Vector3.SmoothDamp(velocity, (distPos - transform.position) * 5, ref accelerate, 0.3f);
+                    velocity = Vector3.SmoothDamp(velocity, (distPos - transform.position) * 5, ref accelerate, 0.1f);
                     _spriteRenderer.color = new Color(_spriteRenderer.color.r, _spriteRenderer.color.g, _spriteRenderer.color.b, 1);
                 }
             }

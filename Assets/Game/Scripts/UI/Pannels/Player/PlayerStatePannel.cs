@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.UI.Pannels
+namespace Island.UI.Pannels.Player
 {
-    class PlayerPannel : MonoBehaviour
+    class PlayerStatePannel : MonoBehaviour
     {
 
     }

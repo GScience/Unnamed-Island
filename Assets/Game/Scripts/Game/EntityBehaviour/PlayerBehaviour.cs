@@ -1,8 +1,10 @@
 
+using island.Game.World;
 using Island.Game.EntityBehaviour;
 using Island.Game.World;
 using Island.UI;
 using Island.UI.Pannels;
+using Island.UI.Pannels.Player;
 using Spine.Unity;
 using System;
 using System.Collections.Generic;
@@ -44,7 +46,6 @@ namespace Island.Game.EntityBehaviour
         protected override void Init()
         {
             Inventory = GetEntityBehaviour<InventoryBehaviour>();
-            Inventory.InventorySize = 20;
 
             _playerInteractionPannel = Pannel.Show("PlayerInteractionPannel").GetComponent<PlayerInteractionPannel>();
             Entity.HasUpdation = true;

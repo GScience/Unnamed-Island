@@ -15,23 +15,24 @@ namespace Island.Game.EntityBehaviour
     {
         private Item[] _items = new Item[0];
 
-        public int InventorySize
+        public int inventorySize = 1;
+
+        private void Awake()
         {
-            get => _items.Length;
-            set
-            {
-                Array.Resize(ref _items, value);
-            }
+            _items = new Item[inventorySize];
+
+            for (var i = 0; i < _items.Length; ++i)
+                _items[i] = new Item();
         }
 
         protected override void EntityLoad(DataTag dataTag)
         {
-            if (InventorySize < 1)
+            if (inventorySize < 1)
                 Debug.LogError("Inventory size should not be less than 1");
 
             var itemListCount = dataTag.Get<int>("itemCount");
 
-            for (var i = 0; i < Mathf.Min(itemListCount, InventorySize); ++i)
+            for (var i = 0; i < Mathf.Min(itemListCount, inventorySize); ++i)
             {
                 var itemName = dataTag.Get<string>($"item{i}.name");
                 var itemCount = dataTag.Get<int>($"item{i}.count");
@@ -39,12 +40,8 @@ namespace Island.Game.EntityBehaviour
                 if (string.IsNullOrEmpty(itemName))
                     continue;
 
-                _items[i] = 
-                    new Item
-                    {
-                        itemProxy = GameManager.ProxyManager.Get<IItem>(itemName),
-                        count = itemCount
-                    };
+                _items[i].itemProxy = GameManager.ProxyManager.Get<IItem>(itemName);
+                _items[i].count = itemCount;
             }
         }
 
@@ -64,7 +61,7 @@ namespace Island.Game.EntityBehaviour
         /// </summary>
         /// <param name="item">无法添加的物品</param>
         /// <returns></returns>
-        public Item AddItem(Item addedItem)
+        public void AddItem(ref Item addedItem)
         {
             if (addedItem == null)
                 Debug.LogError("Can't add a null item to inventory");
@@ -74,7 +71,7 @@ namespace Island.Game.EntityBehaviour
 
             for (var i = 0; i < _items.Length; ++i)
             {
-                if (_items[i] == null)
+                if (_items[i].itemProxy == null)
                 {
                     firstEmptyPos = Mathf.Min(firstEmptyPos, i);
                     continue;
@@ -97,14 +94,11 @@ namespace Island.Game.EntityBehaviour
                     break;
             }
 
-            if (addedItem.count == 0)
-                return addedItem;
+            if (addedItem.count == 0 || firstEmptyPos == int.MaxValue)
+                return;
 
-            _items[firstEmptyPos] = new Item
-            {
-                itemProxy = addedItem.itemProxy,
-                count = addedItem.count
-            };
+            _items[firstEmptyPos].itemProxy = addedItem.itemProxy;
+            _items[firstEmptyPos].count = addedItem.count;
 
             if (_items[firstEmptyPos].count <= maxCount)
                 addedItem.count = 0;
@@ -113,8 +107,6 @@ namespace Island.Game.EntityBehaviour
                 addedItem.count = _items[firstEmptyPos].count - maxCount;
                 _items[firstEmptyPos].count = maxCount;
             }
-            
-            return addedItem;
         }
 
         protected override void Init()

@@ -84,7 +84,6 @@ GameObject:
   - component: {fileID: 8091680815156824550}
   - component: {fileID: 8091680815156824549}
   - component: {fileID: 8091680815156824548}
-  - component: {fileID: 8091680815156824546}
   m_Layer: 0
   m_Name: PlayerInteractionPannel
   m_TagString: Untagged
@@ -157,9 +156,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8091680815156824347}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48cdbcd1bf11ae748abf4ba6c9ec5392, type: 3}
+  m_Script: {fileID: 11500000, guid: 68aebb926854ec249966e463ed8ec8aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactionTipPerfabs: {fileID: 972144031024909178, guid: b875777dd6025b846b9a19c5b1762f9f,
+    type: 3}
+  interactionTipParent: {fileID: 8091680813909356668}
 --- !u!225 &8091680815156824549
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -186,18 +188,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   faderState: 0
   fadingSpeed: 5
---- !u!114 &8091680815156824546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8091680815156824347}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0600dc6f72667b94096c62737680ebdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionTipPerfabs: {fileID: 972144031024909178, guid: b875777dd6025b846b9a19c5b1762f9f,
-    type: 3}
-  interactionTipParent: {fileID: 8091680813909356668}

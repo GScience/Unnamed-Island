@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.UI.Pannels
+namespace Island.UI.Pannels.Player
 {
     [RequireComponent(typeof(Pannel))]
     class PlayerInteractionPannel : MonoBehaviour

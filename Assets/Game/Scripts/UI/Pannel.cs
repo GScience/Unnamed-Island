@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Island.UI
 {
     [RequireComponent(typeof(Canvas))]
-    public class Pannel : MonoBehaviour
+    public sealed class Pannel : MonoBehaviour
     {
         public enum PannelAnimType
         {

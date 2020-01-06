@@ -27,6 +27,11 @@ namespace Island.Game.EntityBehaviour
         /// 在实体以及行为创建完成后调用，此时未加载数据
         /// </summary>
         protected abstract void Init();
+
+        /// <summary>
+        /// 加载数据，在所有实体行为初始化完成后调用
+        /// </summary>
+        /// <param name="dataTag"></param>
         protected abstract void EntityLoad(DataTag dataTag);
         protected abstract void EntitySave(DataTag dataTag);
 
