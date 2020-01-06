@@ -74,7 +74,7 @@ namespace Island.Game.EntityBehaviour
             _spriteRenderer1.color = new Color(0.7f, 0.7f, 0.7f, 1);
             _spriteRenderer2.color = new Color(0.7f, 0.7f, 0.7f, 1);
 
-            player.BindInteraction(KeyCode.F, "采集",
+            player.BindInteraction(KeyCode.P, "采集",
             new Action(() =>
             {
                 SendMessage("OnPlayerCollect", player);
