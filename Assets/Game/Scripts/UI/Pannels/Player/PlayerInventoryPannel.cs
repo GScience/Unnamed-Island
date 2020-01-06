@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Island.UI.Pannels.Player
 {
@@ -15,9 +16,14 @@ namespace Island.UI.Pannels.Player
     {
         private Pannel _pannel;
 
-        public ItemSlot[] itemSlots;
+        public ItemSlot[] playerBagSlots;
+        public ItemSlot[] fastToolSelectSlots;
+
+        public Image fastToolSelectorImage;
 
         public InventoryBehaviour inventory;
+
+        private int _selectedItemIndex;
 
         void Awake()
         {
@@ -28,8 +34,28 @@ namespace Island.UI.Pannels.Player
         {
             _pannel.Canvas.sortingOrder = (int)UILayer.PlayerInventory;
 
-            for (var i = 0; i < itemSlots.Length; ++i)
-                itemSlots[i].Item = inventory.GetItem(i);
+            var itemIndex = 0;
+
+            for (var i = 0; i < fastToolSelectSlots.Length; ++i)
+                fastToolSelectSlots[i].Item = inventory.GetItem(itemIndex++);
+
+            for (var i = 0; i < playerBagSlots.Length; ++i)
+                playerBagSlots[i].Item = inventory.GetItem(itemIndex++);
+        }
+
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+                _selectedItemIndex++;
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+                _selectedItemIndex--;
+
+            if (_selectedItemIndex >= fastToolSelectSlots.Length)
+                _selectedItemIndex = 0;
+            if (_selectedItemIndex < 0)
+                _selectedItemIndex = fastToolSelectSlots.Length - 1;
+
+            fastToolSelectorImage.rectTransform.position = fastToolSelectSlots[_selectedItemIndex].GetComponent<RectTransform>().position;
         }
     }
 }
