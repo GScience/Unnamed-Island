@@ -126,7 +126,7 @@ namespace Island.Game.World
                             "type", "island.entity:drop_item"
                        },
                        {
-                            "position", pos + Vector3.up
+                            "position", pos + Vector3.up * 0.5f
                        },
                        {
                             "item", "island.item:stone"

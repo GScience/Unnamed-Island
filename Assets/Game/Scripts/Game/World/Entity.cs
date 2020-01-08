@@ -69,6 +69,8 @@ namespace Island.Game.World
         /// </summary>
         private bool _canMove;
 
+        private Chunk _currentChunk;
+
         /// <summary>
         /// 获取实体所在Chunk
         /// </summary>
@@ -76,7 +78,11 @@ namespace Island.Game.World
         /// <returns></returns>
         public Chunk GetChunk()
         {
-            return GameManager.WorldManager.GetChunk(ChunkPos);
+            if (_currentChunk != null && _currentChunk.isActiveAndEnabled && _currentChunk.ChunkPos == ChunkPos)
+                return _currentChunk;
+
+            _currentChunk = GameManager.WorldManager.GetChunk(ChunkPos);
+            return _currentChunk;
         }
 
         /// <summary>

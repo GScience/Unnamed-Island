@@ -87,11 +87,17 @@ namespace Island.Game.EntityBehaviour
             }
             else
             {
-                // 物品受重力影响掉落
-                if (velocity.y <= float.Epsilon && Physics.Raycast(transform.position, Vector3.down, 0.5f, 1 << BlockContainer.Layer))
-                    velocity = Vector3.zero;
+                // 超出范围不受物理影响
+                if (Vector3.Distance(transform.position, GameManager.Player.transform.position) > 5 && velocity.y <= float.Epsilon)
+                    velocity.y = 0;
                 else
-                    velocity.y -= 10 * Time.deltaTime;
+                {
+                    // 物品受重力影响掉落
+                    if (velocity.y <= float.Epsilon && Physics.Raycast(transform.position, Vector3.down, 0.5f, 1 << BlockContainer.Layer))
+                        velocity = Vector3.zero;
+                    else
+                        velocity.y -= 10 * Time.deltaTime;
+                }
             }
 
             // 运动
