@@ -137,8 +137,6 @@ namespace Island.UI.Pannels.Inventory
             if (selectedItem.itemProxy != null && selectedItem.itemProxy != Item.itemProxy)
                 return;
 
-            selectedItem.itemProxy = Item.itemProxy;
-
             if (selectedItem.count >= Item.itemProxy.GetMaxStackCount() || Item.count <= 0)
                 return;
 
@@ -148,6 +146,8 @@ namespace Island.UI.Pannels.Inventory
 
             if (OnTake != null && !OnTake(Item.itemProxy, takeCount))
                 return;
+
+            selectedItem.itemProxy = Item.itemProxy;
 
             selectedItem.count = selectedItem.count + takeCount;
             Item.count -= takeCount;
@@ -175,10 +175,10 @@ namespace Island.UI.Pannels.Inventory
             if (Item.count >= selectedItem.itemProxy.GetMaxStackCount() || selectedItem.count <= 0)
                 return;
 
-            Item.itemProxy = selectedItem.itemProxy;
-
             if (OnPut != null && !OnPut(Item.itemProxy, 1))
                 return;
+
+            Item.itemProxy = selectedItem.itemProxy;
 
             selectedItem.count--;
 
