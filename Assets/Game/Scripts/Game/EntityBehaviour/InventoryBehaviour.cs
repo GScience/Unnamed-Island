@@ -125,6 +125,11 @@ namespace Island.Game.EntityBehaviour
             return _items[slotId];
         }
 
+        public Pannel GetPannel()
+        {
+            return _pannel;
+        }
+
         public void ShowUI()
         {
             if (InventoryPannel.CurrendClosableInventoryPannel != null)

@@ -139,7 +139,10 @@ namespace Island.Game.World
 
                 // 所在Chunk无效时不刷新实体
                 var chunk = GetChunk();
-                _canMove = chunk != null && chunk.IsPhysicsReady;
+                _canMove = 
+                    chunk != null && 
+                    chunk.IsPhysicsReady && 
+                    Vector3.Distance(transform.position, GameManager.Player.transform.position) < 28.0f;
             }
 
             // 刷新实体移动

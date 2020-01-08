@@ -70,7 +70,9 @@ namespace Island.Game.World
                     height * worldInfo.blockSize.y,
                     chunkPos.z * worldInfo.chunkSize.z + (z + 0.5f) * worldInfo.blockSize.z);
 
-                if (_random.Next(0, 5) > 2)
+                var type = _random.Next(0, 3);
+
+                if (type == 0)
                 {
                     var envElement = new DataTag(
                         new Dictionary<string, object>
@@ -91,7 +93,7 @@ namespace Island.Game.World
                         );
                     entityData.Add(envElement);
                 }
-                else
+                else if (type == 1)
                 {
                     var envElement = new DataTag(
                         new Dictionary<string, object>
@@ -112,21 +114,47 @@ namespace Island.Game.World
                         );
                     entityData.Add(envElement);
                 }
+                else if (type == 2)
+                {
+                    var dropStone = new DataTag(
+                       new Dictionary<string, object>
+                       {
+                       {
+                            "name", "DropStone"
+                       },
+                       {
+                            "type", "island.entity:drop_item"
+                       },
+                       {
+                            "position", pos + Vector3.up
+                       },
+                       {
+                            "item", "island.item:stone"
+                       },
+                       {
+                            "itemCount", 1
+                       }
+                       }
+                       );
+                    entityData.Add(dropStone);
+                }
             }
 
-            var height2 = GetHeight(
-                    chunkPos.x * worldInfo.chunkSize.x,
-                    chunkPos.z * worldInfo.chunkSize.z,
-                    worldInfo.chunkSize.y / 3 * 2);
+            if (chunkPos.x == 1 && chunkPos.z == 1)
+            {
+                var height2 = GetHeight(
+                        chunkPos.x * worldInfo.chunkSize.x,
+                        chunkPos.z * worldInfo.chunkSize.z,
+                        worldInfo.chunkSize.y / 3 * 2);
 
-            var pos2 = new Vector3(
-                    chunkPos.x * worldInfo.chunkSize.x + 0.5f * worldInfo.blockSize.x,
-                    height2 * worldInfo.blockSize.y,
-                    chunkPos.z * worldInfo.chunkSize.z + 0.5f * worldInfo.blockSize.z);
+                var pos2 = new Vector3(
+                        chunkPos.x * worldInfo.chunkSize.x + 0.5f * worldInfo.blockSize.x,
+                        height2 * worldInfo.blockSize.y,
+                        chunkPos.z * worldInfo.chunkSize.z + 0.5f * worldInfo.blockSize.z);
 
-            var chest = new DataTag(
-                        new Dictionary<string, object>
-                        {
+                var chest = new DataTag(
+                    new Dictionary<string, object>
+                    {
                         {
                             "name", "Chest"
                         },
@@ -134,11 +162,29 @@ namespace Island.Game.World
                             "type", "island.entity:chest"
                         },
                         {
-                            "position", pos2
+                            "position", pos2 - Vector3.left
                         }
+                    }
+                    );
+
+                entityData.Add(chest);
+
+                var craftTable = new DataTag(
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "name", "CraftTable"
+                        },
+                        {
+                            "position", pos2 + Vector3.left
+                        },
+                        {
+                            "type", "island.entity:craft_table"
                         }
-                        );
-            entityData.Add(chest);
+                    }
+                    );
+                entityData.Add(craftTable);
+            }
         }
 
         public override void GenGlobalEntity(ref List<DataTag> globalEntityList)

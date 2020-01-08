@@ -45,6 +45,11 @@ namespace Island.Game.EntityBehaviour
 
         protected override void EntityUpdate()
         {
+            _spriteRenderer.transform.localPosition = new Vector3(
+                0, 
+                Mathf.Sin((Time.time + gameObject.GetInstanceID() / 10.0f) * 2) * 0.1f, 
+                0);
+
             // 计算速度和拾取
             if (_pickupBy != null)
             {

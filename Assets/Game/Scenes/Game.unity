@@ -187,6 +187,7 @@ MonoBehaviour:
   - {fileID: 2074161104929829360, guid: 35246a29dd1d33b49b67c180566fa611, type: 3}
   - {fileID: 5571393072689281962, guid: 235d1eb9e8eef704bacb07f34972c327, type: 3}
   - {fileID: 9118009213008869398, guid: 457b3f8d4f365604ca721d8186cdc458, type: 3}
+  - {fileID: 4916359520583995260, guid: 2ce0a4bfa38456f4fa515f5014fabcdb, type: 3}
 --- !u!4 &91245483
 Transform:
   m_ObjectHideFlags: 0
@@ -398,6 +399,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: aaf646f5579ff254e9e120b92278bd71, type: 3}
   - {fileID: 21300000, guid: e33ba9c97ac53d14f940a9fb198aff32, type: 3}
   - {fileID: 21300000, guid: 65c026cc1c1320841b42445e4d209fa0, type: 3}
+  - {fileID: 21300000, guid: df65d89d11452a444a4e10b286e18af7, type: 3}
+  - {fileID: 21300000, guid: 4194bba1a0794a94b8b55b9e78b5ffe0, type: 3}
 --- !u!1 &451119698
 GameObject:
   m_ObjectHideFlags: 0
@@ -1715,6 +1718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteList:
   - {fileID: 21300000, guid: c443d11291c028d40809727a797b0cc4, type: 3}
+  - {fileID: 21300000, guid: 521cca479358ca44594c3f18cef8274b, type: 3}
 --- !u!4 &2105972547
 Transform:
   m_ObjectHideFlags: 0

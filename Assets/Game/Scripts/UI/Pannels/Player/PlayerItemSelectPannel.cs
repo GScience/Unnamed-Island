@@ -39,7 +39,7 @@ namespace Island.UI.Pannels.Player
 
             var rectSize = ((RectTransform)selectedItemSlot.transform).rect;
 
-            selectedItemSlot.transform.position = Input.mousePosition + new Vector3(rectSize.x, -rectSize.y) / 3.0f;
+            selectedItemSlot.transform.position = Input.mousePosition + new Vector3(rectSize.x / 3.0f, -rectSize.y * 0.9f);
 
             if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {

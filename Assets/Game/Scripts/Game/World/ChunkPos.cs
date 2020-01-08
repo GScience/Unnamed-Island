@@ -16,6 +16,11 @@ namespace Island.Game.World
         public int x;
         public int z;
 
+        public static float Distance(ChunkPos chunkPos1, ChunkPos chunkPos2)
+        {
+            return Mathf.Sqrt(Mathf.Pow(chunkPos1.x - chunkPos2.x, 2) + Mathf.Pow(chunkPos1.z - chunkPos2.z, 2));
+        }
+
         public ChunkPos(int x, int z)
         {
             this.x = x;

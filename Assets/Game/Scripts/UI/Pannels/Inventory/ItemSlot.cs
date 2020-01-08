@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Island.Game.Proxy.Items;
 
 namespace Island.UI.Pannels.Inventory
 {
@@ -19,9 +20,9 @@ namespace Island.UI.Pannels.Inventory
 
         public Item Item { get; set; }
 
-        public Func<int, bool> OnTake;
+        public Func<IItem, int, bool> OnTake;
 
-        public Func<int, bool> OnPut;
+        public Func<IItem, int, bool> OnPut;
 
         void Start()
         {
@@ -78,6 +79,12 @@ namespace Island.UI.Pannels.Inventory
         /// </summary>
         void Swap()
         {
+            if (OnTake != null && !OnTake(Item.itemProxy, Item.count))
+                return;
+
+            if (OnPut != null && !OnPut(PlayerItemSelectPannel.Item.itemProxy, PlayerItemSelectPannel.Item.count))
+                return;
+
             var selectedItemProxy = PlayerItemSelectPannel.Item.itemProxy;
             var selectedItemCount = PlayerItemSelectPannel.Item.count;
             PlayerItemSelectPannel.Item.itemProxy = Item.itemProxy;
@@ -99,14 +106,13 @@ namespace Island.UI.Pannels.Inventory
             if (selectedItem.itemProxy != null && selectedItem.itemProxy != Item.itemProxy)
                 return;
 
-            selectedItem.itemProxy = Item.itemProxy;
-
             if (selectedItem.count >= Item.itemProxy.GetMaxStackCount() || Item.count <= 0)
                 return;
 
-            if (OnTake != null && !OnTake(1))
+            if (OnTake != null && !OnTake(Item.itemProxy, 1))
                 return;
 
+            selectedItem.itemProxy = Item.itemProxy;
             Item.count--;
 
             if (Item.count <= 0)
@@ -140,7 +146,7 @@ namespace Island.UI.Pannels.Inventory
             if (selectedItem.count + takeCount >= Item.itemProxy.GetMaxStackCount())
                 takeCount = Item.itemProxy.GetMaxStackCount() - selectedItem.count;
 
-            if (OnTake != null && !OnTake(takeCount))
+            if (OnTake != null && !OnTake(Item.itemProxy, takeCount))
                 return;
 
             selectedItem.count = selectedItem.count + takeCount;
@@ -171,7 +177,7 @@ namespace Island.UI.Pannels.Inventory
 
             Item.itemProxy = selectedItem.itemProxy;
 
-            if (OnPut != null && !OnPut(1))
+            if (OnPut != null && !OnPut(Item.itemProxy, 1))
                 return;
 
             selectedItem.count--;
@@ -203,7 +209,7 @@ namespace Island.UI.Pannels.Inventory
 
             var putCount = selectedItem.count;
 
-            if (OnPut != null && !OnPut(putCount))
+            if (OnPut != null && !OnPut(Item.itemProxy, putCount))
                 return;
 
             Item.itemProxy = selectedItem.itemProxy;
