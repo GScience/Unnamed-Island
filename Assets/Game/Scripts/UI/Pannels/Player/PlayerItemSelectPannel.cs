@@ -37,9 +37,11 @@ namespace Island.UI.Pannels.Player
             if (selectedItem.itemProxy == null)
                 return;
 
-            selectedItemSlot.transform.position = Input.mousePosition;
+            var rectSize = ((RectTransform)selectedItemSlot.transform).rect;
 
-            if (Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject())
+            selectedItemSlot.transform.position = Input.mousePosition + new Vector3(rectSize.x, -rectSize.y) / 3.0f;
+
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out var result) && result.collider != null)

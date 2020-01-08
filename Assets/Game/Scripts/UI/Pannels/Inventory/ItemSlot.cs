@@ -42,22 +42,43 @@ namespace Island.UI.Pannels.Inventory
             if (Item == null)
                 return;
 
-            if (Input.GetKey(KeyCode.Space))
+            var selectedItem = PlayerItemSelectPannel.Item;
+
+            if (eventData.button == PointerEventData.InputButton.Left)
             {
-                if (eventData.button == PointerEventData.InputButton.Left)
+                if (selectedItem.itemProxy == Item.itemProxy)
                     TakeAll();
-                else if (eventData.button == PointerEventData.InputButton.Right)
-                    PutAll();
+                else
+                    Swap();
             }
-            else
+            else if (eventData.button == PointerEventData.InputButton.Right)
             {
-                if (eventData.button == PointerEventData.InputButton.Left)
-                    TakeOne();
-                else if (eventData.button == PointerEventData.InputButton.Right)
-                    PutOne();
+                if (selectedItem.itemProxy == Item.itemProxy || Item.itemProxy == null)
+                {
+                    if (Input.GetKey(KeyCode.Space))
+                        PutAll();
+                    else
+                        PutOne();
+                }
             }
         }
 
+        /// <summary>
+        /// 和手中物品交换
+        /// </summary>
+        void Swap()
+        {
+            var selectedItemProxy = PlayerItemSelectPannel.Item.itemProxy;
+            var selectedItemCount = PlayerItemSelectPannel.Item.count;
+            PlayerItemSelectPannel.Item.itemProxy = Item.itemProxy;
+            PlayerItemSelectPannel.Item.count = Item.count;
+            Item.itemProxy = selectedItemProxy;
+            Item.count = selectedItemCount;
+        }
+
+        /// <summary>
+        /// 拿走一个
+        /// </summary>
         void TakeOne()
         {
             if (Item.itemProxy == null)
@@ -83,6 +104,10 @@ namespace Island.UI.Pannels.Inventory
 
             selectedItem.count++;
         }
+
+        /// <summary>
+        /// 拿走所有
+        /// </summary>
         void TakeAll()
         {
             if (Item.itemProxy == null)
@@ -115,6 +140,9 @@ namespace Island.UI.Pannels.Inventory
             }
         }
 
+        /// <summary>
+        /// 放置一个
+        /// </summary>
         void PutOne()
         {
             var selectedItem = PlayerItemSelectPannel.Item;
@@ -141,6 +169,9 @@ namespace Island.UI.Pannels.Inventory
             Item.count++;
         }
 
+        /// <summary>
+        /// 放置所有
+        /// </summary>
         void PutAll()
         {
             var selectedItem = PlayerItemSelectPannel.Item;

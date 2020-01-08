@@ -136,7 +136,7 @@ namespace Island.Game.EntityBehaviour
 
             if (velocityDirection != Vector3.zero
 #if UNITY_EDITOR
-                && !autoWalk
+                || autoWalk
 #endif
                 ) 
                 skeletonAnim.AnimationName = "Move";
