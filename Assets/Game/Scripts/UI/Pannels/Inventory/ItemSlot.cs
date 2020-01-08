@@ -19,6 +19,15 @@ namespace Island.UI.Pannels.Inventory
 
         public Item Item { get; set; }
 
+        public Func<int, bool> OnTake;
+
+        public Func<int, bool> OnPut;
+
+        void Start()
+        {
+            itemImage.color = new Color(0, 0, 0, 0);
+        }
+
         private void Update()
         {
             if (Item?.count == 0)
@@ -95,6 +104,9 @@ namespace Island.UI.Pannels.Inventory
             if (selectedItem.count >= Item.itemProxy.GetMaxStackCount() || Item.count <= 0)
                 return;
 
+            if (OnTake != null && !OnTake(1))
+                return;
+
             Item.count--;
 
             if (Item.count <= 0)
@@ -124,15 +136,15 @@ namespace Island.UI.Pannels.Inventory
             if (selectedItem.count >= Item.itemProxy.GetMaxStackCount() || Item.count <= 0)
                 return;
 
-            selectedItem.count += Item.count;
+            var takeCount = Item.count;
+            if (selectedItem.count + takeCount >= Item.itemProxy.GetMaxStackCount())
+                takeCount = Item.itemProxy.GetMaxStackCount() - selectedItem.count;
 
-            if (selectedItem.count >= Item.itemProxy.GetMaxStackCount())
-            {
-                Item.count = selectedItem.count - Item.itemProxy.GetMaxStackCount();
-                selectedItem.count = Item.itemProxy.GetMaxStackCount();
-            }
-            else
-                Item.count = 0;
+            if (OnTake != null && !OnTake(takeCount))
+                return;
+
+            selectedItem.count = selectedItem.count + takeCount;
+            Item.count -= takeCount;
 
             if (Item.count <= 0)
             {
@@ -158,6 +170,9 @@ namespace Island.UI.Pannels.Inventory
                 return;
 
             Item.itemProxy = selectedItem.itemProxy;
+
+            if (OnPut != null && !OnPut(1))
+                return;
 
             selectedItem.count--;
 
@@ -186,16 +201,18 @@ namespace Island.UI.Pannels.Inventory
             if (Item.count >= selectedItem.itemProxy.GetMaxStackCount() || selectedItem.count <= 0)
                 return;
 
-            Item.itemProxy = selectedItem.itemProxy;
-            Item.count += selectedItem.count;
+            var putCount = selectedItem.count;
 
-            if (Item.count >= selectedItem.itemProxy.GetMaxStackCount())
-            {
-                selectedItem.count = Item.count - selectedItem.itemProxy.GetMaxStackCount();
-                Item.count = selectedItem.itemProxy.GetMaxStackCount();
-            }
-            else
-                selectedItem.count = 0;
+            if (OnPut != null && !OnPut(putCount))
+                return;
+
+            Item.itemProxy = selectedItem.itemProxy;
+
+            if (Item.count + putCount >= selectedItem.itemProxy.GetMaxStackCount())
+                putCount = selectedItem.itemProxy.GetMaxStackCount() - Item.count;
+
+            Item.count = Item.count + putCount;
+            selectedItem.count -= putCount;
 
             if (selectedItem.count <= 0)
             {

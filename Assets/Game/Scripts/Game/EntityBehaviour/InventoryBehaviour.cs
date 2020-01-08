@@ -7,6 +7,9 @@ using Island.Game.World;
 using Island.Game.Proxy.Items;
 using Island.Game.System;
 using UnityEngine;
+using Island.UI;
+using Island.UI.Pannels.Player;
+using Island.UI.Pannels.Inventory;
 
 namespace Island.Game.EntityBehaviour
 {
@@ -14,24 +17,31 @@ namespace Island.Game.EntityBehaviour
     {
         private Item[] _items = new Item[0];
 
-        public int inventorySize = 1;
-
-        private void Awake()
+        public int InventorySize
         {
-            _items = new Item[inventorySize];
+            get => _items.Length;
+            set
+            {
+                var oldSize = _items.Length;
+                Array.Resize(ref _items, value);
 
-            for (var i = 0; i < _items.Length; ++i)
-                _items[i] = new Item();
+                for (var i = oldSize; i < value; ++i)
+                    _items[i] = new Item();
+            }
         }
+
+        public string inventoryPannel;
+
+        private Pannel _pannel;
 
         protected override void EntityLoad(DataTag dataTag)
         {
-            if (inventorySize < 1)
+            if (InventorySize < 1)
                 Debug.LogError("Inventory size should not be less than 1");
 
             var itemListCount = dataTag.Get<int>("itemCount");
 
-            for (var i = 0; i < Mathf.Min(itemListCount, inventorySize); ++i)
+            for (var i = 0; i < Mathf.Min(itemListCount, InventorySize); ++i)
             {
                 var itemName = dataTag.Get<string>($"item{i}.name");
                 var itemCount = dataTag.Get<int>($"item{i}.count");
@@ -108,16 +118,34 @@ namespace Island.Game.EntityBehaviour
             }
         }
 
-        protected override void Init()
-        {
-            
-        }
-
         public Item GetItem(int slotId)
         {
             if (slotId >= _items.Length)
                 return null;
             return _items[slotId];
+        }
+
+        public void ShowUI()
+        {
+            if (InventoryPannel.CurrendClosableInventoryPannel != null)
+                return;
+
+            _pannel = Pannel.Show(inventoryPannel);
+            _pannel.GetComponent<InventoryPannel>().inventory = this;
+        }
+
+        public void CloseUI()
+        {
+            _pannel?.Close();
+        }
+
+        protected override void OnKill(Entity killBy)
+        {
+            CloseUI();
+        }
+
+        protected override void Init()
+        {
         }
     }
 }

@@ -22,12 +22,14 @@ namespace Island.Game.System
         public static BlockTextureManager BlockTextureManager { get; private set; }
         public static SpriteDatabase EnvElementSpriteDatabase { get; private set; }
         public static SpriteDatabase ItemSpriteDatabase { get; private set; }
+        public static SpriteDatabase EntitySpriteDatabase { get; private set; }
 
         public static PlayerBehaviour Player { get; private set; }
 
         public static bool IsInitializing => WorldManager == null || WorldManager.IsInitializing;
         public PlayerBehaviour player = null;
 
+        public SpriteDatabase entitySpriteDatabase;
         public SpriteDatabase envElementSpriteDatabase;
         public SpriteDatabase itemSpriteDatabase;
 
@@ -39,6 +41,7 @@ namespace Island.Game.System
             Player = player;
             EnvElementSpriteDatabase = envElementSpriteDatabase;
             ItemSpriteDatabase = itemSpriteDatabase;
+            EntitySpriteDatabase = entitySpriteDatabase;
 
             ProxyManager = GetComponent<ProxyManager>();
             WorldManager = GetComponent<WorldManager>();

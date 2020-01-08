@@ -8,6 +8,7 @@ using Spine.Unity;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Island.UI.Pannels.Inventory;
 
 namespace Island.Game.EntityBehaviour
 {
@@ -45,6 +46,7 @@ namespace Island.Game.EntityBehaviour
         protected override void Init()
         {
             Inventory = GetEntityBehaviour<InventoryBehaviour>();
+            Inventory.InventorySize = 20;
 
             _playerInteractionPannel = Pannel.Show("PlayerInteractionPannel").GetComponent<PlayerInteractionPannel>();
             Entity.HasUpdation = true;
@@ -72,6 +74,7 @@ namespace Island.Game.EntityBehaviour
         protected override void EntityLoad(DataTag dataTag)
         {
             Entity.HasUpdation = true;
+            Inventory.ShowUI();
         }
 
         protected override void EntitySave(DataTag dataTag)
@@ -80,6 +83,10 @@ namespace Island.Game.EntityBehaviour
 
         protected override void EntityUpdate()
         {
+            // 当打开物品面板的时候不刷新
+            if (InventoryPannel.CurrendClosableInventoryPannel != null)
+                return;
+
             UpdateAction();
             UpdateSelectedEntity();
 

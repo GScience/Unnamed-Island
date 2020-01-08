@@ -9,28 +9,19 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Island.UI.Pannels.Player
+namespace Island.UI.Pannels.Inventory
 {
     [RequireComponent(typeof(Pannel))]
-    public class PlayerInventoryPannel : MonoBehaviour
+    public class PlayerInventoryPannel : InventoryPannel
     {
-        private Pannel _pannel;
-
         public ItemSlot[] playerBagSlots;
         public ItemSlot[] fastToolSelectSlots;
 
         public Image fastToolSelectorImage;
 
-        public InventoryBehaviour inventory;
-
         private int _selectedItemIndex;
 
-        void Awake()
-        {
-            _pannel = GetComponent<Pannel>();
-        }
-
-        private void Start()
+        protected override void Init()
         {
             _pannel.Canvas.sortingOrder = (int)UILayer.PlayerInventory;
 
@@ -43,8 +34,10 @@ namespace Island.UI.Pannels.Player
                 playerBagSlots[i].Item = inventory.GetItem(itemIndex++);
         }
 
-        void Update()
+        protected override void Update()
         {
+            base.Update();
+
             if (Input.GetKeyDown(KeyCode.RightArrow))
                 _selectedItemIndex++;
             if (Input.GetKeyDown(KeyCode.LeftArrow))

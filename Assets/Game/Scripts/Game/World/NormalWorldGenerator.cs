@@ -113,6 +113,32 @@ namespace Island.Game.World
                     entityData.Add(envElement);
                 }
             }
+
+            var height2 = GetHeight(
+                    chunkPos.x * worldInfo.chunkSize.x,
+                    chunkPos.z * worldInfo.chunkSize.z,
+                    worldInfo.chunkSize.y / 3 * 2);
+
+            var pos2 = new Vector3(
+                    chunkPos.x * worldInfo.chunkSize.x + 0.5f * worldInfo.blockSize.x,
+                    height2 * worldInfo.blockSize.y,
+                    chunkPos.z * worldInfo.chunkSize.z + 0.5f * worldInfo.blockSize.z);
+
+            var chest = new DataTag(
+                        new Dictionary<string, object>
+                        {
+                        {
+                            "name", "Chest"
+                        },
+                        {
+                            "type", "island.entity:chest"
+                        },
+                        {
+                            "position", pos2
+                        }
+                        }
+                        );
+            entityData.Add(chest);
         }
 
         public override void GenGlobalEntity(ref List<DataTag> globalEntityList)
