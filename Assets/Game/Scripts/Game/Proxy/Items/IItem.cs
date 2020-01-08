@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Island.Game.Proxy.Item
+namespace Island.Game.Proxy.Items
 {
     public interface IItem : IProxy
     {

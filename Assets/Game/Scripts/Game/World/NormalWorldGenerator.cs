@@ -70,9 +70,11 @@ namespace Island.Game.World
                     height * worldInfo.blockSize.y,
                     chunkPos.z * worldInfo.chunkSize.z + (z + 0.5f) * worldInfo.blockSize.z);
 
-                var envElement = new DataTag(
-                    new Dictionary<string, object>
-                    {
+                if (_random.Next(0, 5) > 2)
+                {
+                    var envElement = new DataTag(
+                        new Dictionary<string, object>
+                        {
                         {
                             "name", "EnvElement"
                         },
@@ -85,10 +87,31 @@ namespace Island.Game.World
                         {
                             "envElement", "island.env_element:withered_grass"
                         }
-                    }
-                    );
-
-                entityData.Add(envElement);
+                        }
+                        );
+                    entityData.Add(envElement);
+                }
+                else
+                {
+                    var envElement = new DataTag(
+                        new Dictionary<string, object>
+                        {
+                        {
+                            "name", "EnvElement"
+                        },
+                        {
+                            "type", "island.entity:env_element"
+                        },
+                        {
+                            "position", pos
+                        },
+                        {
+                            "envElement", "island.env_element:grass"
+                        }
+                        }
+                        );
+                    entityData.Add(envElement);
+                }
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using island.Game.World;
+﻿using Island.Game.World;
 using Island.Game.EntityBehaviour;
 using Island.UI.Pannels.Player;
 using System;

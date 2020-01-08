@@ -1,7 +1,6 @@
 
-using island.Game.World;
-using Island.Game.EntityBehaviour;
 using Island.Game.World;
+using Island.Game.EntityBehaviour;
 using Island.UI;
 using Island.UI.Pannels;
 using Island.UI.Pannels.Player;

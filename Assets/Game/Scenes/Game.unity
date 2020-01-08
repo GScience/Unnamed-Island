@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -391,6 +391,8 @@ MonoBehaviour:
   spriteList:
   - {fileID: 21300000, guid: 5ca02f3fa1142cb468c09c21a6049fb3, type: 3}
   - {fileID: 21300000, guid: aaf646f5579ff254e9e120b92278bd71, type: 3}
+  - {fileID: 21300000, guid: e33ba9c97ac53d14f940a9fb198aff32, type: 3}
+  - {fileID: 21300000, guid: 65c026cc1c1320841b42445e4d209fa0, type: 3}
 --- !u!1001 &438739729
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1591,7 +1593,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteList:
-  - {fileID: 21300000, guid: e1e0e1dd683373941b521b47dfae53c3, type: 3}
+  - {fileID: 21300000, guid: 961dec36f47ed2648a106e952bcd5e62, type: 3}
+  - {fileID: 21300000, guid: fbcee21b9f424964284f4daa033fccb5, type: 3}
 --- !u!1 &1232245846
 GameObject:
   m_ObjectHideFlags: 0

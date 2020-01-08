@@ -1,4 +1,4 @@
-﻿using island.Game.Extension.World;
+﻿using Island.Game.Extension.World;
 using Island.Game.Proxy.EnvElements;
 using Island.Game.System;
 using Island.Game.World;
@@ -64,7 +64,8 @@ namespace Island.Game.EntityBehaviour
             if (entityChunk == null)
                 yield break;
 
-            entityChunk.CreateDropItem("island.item:dried_grass", 1, transform.position);
+            var fallingItem = envElement.GetFallingItem();
+            entityChunk.CreateDropItem(fallingItem.itemProxy?.Name, fallingItem.count, transform.position);
 
             Entity.BeKilled(player.Entity);
         }

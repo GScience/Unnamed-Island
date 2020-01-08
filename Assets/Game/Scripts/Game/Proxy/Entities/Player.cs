@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Island.Game.Proxy.Entity
+namespace Island.Game.Proxy.Entities
 {
-    public class EnvElement : IEntity
+    public class Player : IEntity
     {
-        public string Name => "island.entity:env_element";
+        public string Name => "island.entity:player";
 
         public Type[] EntityBehaviours =>
             new Type[]
             {
-                typeof(EnvElementBehaviour)
+                typeof(PlayerBehaviour)
             };
 
         public void Init()

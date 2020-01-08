@@ -1,9 +1,8 @@
-﻿using island.Game.World;
+﻿using Island.Game.World;
 using Island.Game.EntityBehaviour;
-using Island.Game.Proxy.Item;
+using Island.Game.Proxy.Items;
 using Island.Game.Render;
 using Island.Game.System;
-using Island.Game.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;

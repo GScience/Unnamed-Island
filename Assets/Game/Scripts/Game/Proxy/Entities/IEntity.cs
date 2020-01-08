@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Island.Game.Proxy.Entity
+namespace Island.Game.Proxy.Entities
 {
     public interface IEntity : IProxy
     {

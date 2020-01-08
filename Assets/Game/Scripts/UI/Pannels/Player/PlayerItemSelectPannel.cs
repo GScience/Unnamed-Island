@@ -1,4 +1,4 @@
-﻿using island.Game.World;
+﻿using Island.Game.World;
 using Island.Game.Extension.World;
 using Island.Game.System;
 using Island.UI.Pannels.Inventory;

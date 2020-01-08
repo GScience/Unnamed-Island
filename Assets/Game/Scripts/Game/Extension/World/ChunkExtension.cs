@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace island.Game.Extension.World
+namespace Island.Game.Extension.World
 {
     /// <summary>
     /// 区块扩展，生成常用实体等

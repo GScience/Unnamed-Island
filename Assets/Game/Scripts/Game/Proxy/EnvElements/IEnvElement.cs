@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Island.Game.World;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,6 @@ namespace Island.Game.Proxy.EnvElements
         Sprite GetEnvElementSprite();
         float GetColliderSize();
         Vector3 GetColliderCenter();
+        Item GetFallingItem();
     }
 }

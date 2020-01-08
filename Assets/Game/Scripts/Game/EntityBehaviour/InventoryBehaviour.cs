@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using island.Game.World;
-using Island.Game.Proxy.Item;
-using Island.Game.System;
 using Island.Game.World;
+using Island.Game.Proxy.Items;
+using Island.Game.System;
 using UnityEngine;
 
 namespace Island.Game.EntityBehaviour

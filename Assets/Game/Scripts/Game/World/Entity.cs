@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.Proxy.Entity;
+using Island.Game.Proxy.Entities;
 using Island.Game.System;
 using Island.Game.World;
 using UnityEditor;

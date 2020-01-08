@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Island.Game.World;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Island.Game.World;
 using UnityEngine;
 
 namespace Island.Game.Proxy.EnvElements
 {
-    public class WitheredGrass : EnvElementBase
+    public class Grass : EnvElementBase
     {
-        public override string Name => "island.env_element:withered_grass";
+        public override string Name => "island.env_element:grass";
 
         protected override string GetSpriteName()
         {
-            return "withered_grass";
+            return "grass";
         }
 
         public override float GetColliderSize()
@@ -29,7 +29,7 @@ namespace Island.Game.Proxy.EnvElements
 
         public override Item GetFallingItem()
         {
-            return new Item("island.item:dried_grass", 1);
+            return new Item("island.item:fresh_grass", 1);
         }
     }
 }
