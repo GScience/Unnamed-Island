@@ -46,7 +46,8 @@ namespace Island.UI.Pannels.Inventory
 
             if (eventData.button == PointerEventData.InputButton.Left)
             {
-                if (selectedItem.itemProxy == Item.itemProxy)
+                if (selectedItem.itemProxy == Item.itemProxy && 
+                    selectedItem.count < (selectedItem.itemProxy?.GetMaxStackCount() ?? int.MaxValue))
                     TakeAll();
                 else
                     Swap();
