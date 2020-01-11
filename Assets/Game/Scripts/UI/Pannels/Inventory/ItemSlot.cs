@@ -79,10 +79,14 @@ namespace Island.UI.Pannels.Inventory
         /// </summary>
         void Swap()
         {
-            if (OnTake != null && !OnTake(Item.itemProxy, Item.count))
+            if (OnTake != null && 
+                Item.count != 0 && 
+                !OnTake(Item.itemProxy, Item.count))
                 return;
 
-            if (OnPut != null && !OnPut(PlayerItemSelectPannel.Item.itemProxy, PlayerItemSelectPannel.Item.count))
+            if (OnPut != null && 
+                PlayerItemSelectPannel.Item.count != 0 && 
+                !OnPut(PlayerItemSelectPannel.Item.itemProxy, PlayerItemSelectPannel.Item.count))
                 return;
 
             var selectedItemProxy = PlayerItemSelectPannel.Item.itemProxy;

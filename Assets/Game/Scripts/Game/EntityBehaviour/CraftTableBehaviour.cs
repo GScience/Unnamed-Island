@@ -15,6 +15,8 @@ namespace Island.Game.EntityBehaviour
     [RequireComponent(typeof(InventoryBehaviour), typeof(Entity))]
     public class CraftTableBehaviour : EntityBehaviour
     {
+        public const string ToolName = "craft_table";
+
         private SpriteRenderer _spriteRenderer;
         private InventoryBehaviour _inventoryBehaviour;
 
@@ -57,7 +59,6 @@ namespace Island.Game.EntityBehaviour
         {
             _inventoryBehaviour.ShowUI();
             var craftTablePannel = _inventoryBehaviour.GetPannel().GetComponent<CraftTablePannel>();
-            craftTablePannel.resultSolt.OnPut += (IItem item, int _) => false;
         }
     }
 }
